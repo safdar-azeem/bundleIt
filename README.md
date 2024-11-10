@@ -57,7 +57,7 @@ yarn tauri build
 
 ## Development Stack 🛠️
 
-- [Tauri 2.0](https://tauri.app/) - Framework
+- [Tauri 2.0](https://v2.tauri.app/) - Framework
 - [Vue 3](https://vuejs.org/) - Frontend
 - [Rust](https://www.rust-lang.org/) - Backend
 - [TypeScript](https://www.typescriptlang.org/) - Type Safety
@@ -66,8 +66,8 @@ yarn tauri build
 ## Support 💬
 
 If you encounter any issues or have questions:
-- [Open an issue](https://github.com/yourusername/bundleit/issues)
-- [Check existing issues](https://github.com/yourusername/bundleit/issues?q=is%3Aissue)
+- [Open an issue](https://github.com/safdar-azeem/bundleit/issues)
+- [Check existing issues](https://github.com/safdar-azeem/bundleit/issues?q=is%3Aissue)
 
 ---
 Made with ❤️ by [Safdar Azeem](https://github.com/safdar-azeem)

@@ -16,6 +16,7 @@ const props = defineProps<{
    items: FileNode[]
    selectedPaths: Set<string>
    isNested?: boolean
+   isSearching?: boolean
    parentPath?: string
 }>()
 
@@ -221,13 +222,14 @@ const toggleSelection = async (node: FileNode) => {
                   class="ml-6 mb-1 mt-1 children-container"
                   :class="{
                      hidden: !expandedNodes.has(item.path),
-                     block: expandedNodes.has(item.path),
+                     block: isSearching || expandedNodes.has(item.path),
                   }">
                   <FileTreeView
                      v-if="item.children"
                      :items="sortItems(item.children)"
                      :selected-paths="selectedPaths"
                      :is-nested="true"
+                     :isSearching="isSearching"
                      :parent-path="item.path"
                      @update:selectedPaths="emit('update:selectedPaths', $event)" />
                </div>

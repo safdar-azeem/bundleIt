@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
    'update:filteredItems': [items: FileNode[]]
+   'update:isSearching': [value: boolean]
 }>()
 
 const searchQuery = ref('')
@@ -47,6 +48,7 @@ watch(
       const filtered = newQuery ? filterNodes(props.items, newQuery) : props.items
 
       emit('update:filteredItems', filtered)
+      emit('update:isSearching', !!newQuery)
    },
    { immediate: true, deep: true }
 )

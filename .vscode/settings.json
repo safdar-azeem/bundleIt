@@ -1,0 +1,12 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "scss.lint.unknownAtRules": "ignore",
+    "css.lint.unknownAtRules": "ignore",
+    "less.lint.unknownAtRules": "ignore",
+    "css.lint.unknownProperties": "ignore",
+    "css.lint.unknownVendorSpecificProperties": "ignore",
+    "less.lint.unknownVendorSpecificProperties": "ignore",
+    "scss.lint.unknownProperties": "ignore",
+    "vue.lint.unknownVendorSpecificProperties": "ignore",
+    "scss.lint.unknownVendorSpecificProperties": "ignore",
+}

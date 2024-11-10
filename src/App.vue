@@ -10,6 +10,7 @@ import SearchFilesFilter from './components/SearchFilesFilter.vue'
 import ToastNotification from './components/ToastNotification.vue'
 import { useFileOperations } from './composables/useFileOperations'
 import { computed, watch, ref, onMounted, defineAsyncComponent } from 'vue'
+import WelcomeModal from './components/WelcomeModal.vue'
 
 const showSettings = ref(false)
 const PreviewModal = defineAsyncComponent(() => import('./components/PreviewModal.vue'))
@@ -19,6 +20,7 @@ const showPreview = ref(false)
 const currentBundleContent = ref('')
 const filteredItems = ref<any[]>([])
 const isSearching = ref(false)
+const showWelcome = ref(!localStorage.getItem('has-seen-welcome'))
 
 const {
    currentPath,
@@ -214,6 +216,8 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
          v-model:show="showPreview"
          :content="previewContent"
          @save="showPreview = false" />
+
+      <WelcomeModal v-model:show="showWelcome" />
    </div>
 </template>
 

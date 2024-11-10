@@ -8,8 +8,6 @@ export function useNotifications() {
       type: 'info',
    })
 
-   const showClearConfirm = ref(false)
-
    function showToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
       toast.value = {
          show: true,
@@ -23,7 +21,6 @@ export function useNotifications() {
 
    return {
       toast,
-      showClearConfirm,
       showToast,
    }
 }

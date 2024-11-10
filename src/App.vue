@@ -35,7 +35,7 @@ const {
    refreshCurrentFolder,
 } = useFileOperations()
 
-const { toast, showClearConfirm, showToast } = useNotifications()
+const { toast, showToast } = useNotifications()
 
 watch(
    selectedPaths,
@@ -59,7 +59,10 @@ async function handleSaveBundle() {
 }
 
 function handleClearHistory() {
-   showClearConfirm.value = true
+   currentPath.value = null
+   selectedPaths.value.clear()
+   filteredItems.value = []
+   items.value = []
 }
 
 function removeItem(path: string) {
@@ -67,6 +70,7 @@ function removeItem(path: string) {
       currentPath.value = null
       selectedPaths.value.clear()
       filteredItems.value = []
+      items.value = []
    }
 }
 
@@ -164,7 +168,7 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
          </div>
 
          <!-- File Tree -->
-         <div class="flex-1 overflow-y-auto web-scrollbar bg-body">
+         <div class="flex-1 overflow-y-auto web-scrollbar bg-body select-none">
             <div class="max-w-screen-xl mx-auto px-6 py-4">
                <div
                   v-if="isLoadingFolder"

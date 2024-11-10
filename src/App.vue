@@ -1,160 +1,222 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/core";
+import { Icon } from '@iconify/vue'
+import Button from './components/Button.vue'
+import Sidebar from './components/Sidebar.vue'
+import FileTreeView from './components/FileTreeView.vue'
+import SettingsModal from './components/SettingsModal.vue'
+import { getCurrentWebview } from '@tauri-apps/api/webview'
+import { useNotifications } from './composables/useNotifications'
+import SearchFilesFilter from './components/SearchFilesFilter.vue'
+import ToastNotification from './components/ToastNotification.vue'
+import { useFileOperations } from './composables/useFileOperations'
+import { computed, watch, ref, onMounted, defineAsyncComponent } from 'vue'
 
-const greetMsg = ref("");
-const name = ref("");
+const showSettings = ref(false)
+const PreviewModal = defineAsyncComponent(() => import('./components/PreviewModal.vue'))
 
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
+const previewContent = ref('')
+const showPreview = ref(false)
+const currentBundleContent = ref('')
+const filteredItems = ref<any[]>([])
+
+const {
+   currentPath,
+   items,
+   selectedPaths,
+   isProcessing,
+   error,
+   isLoadingFolder,
+   totalLines,
+   clearCache,
+   selectFolder,
+   createBundle,
+   updateSelections,
+   refreshCurrentFolder,
+} = useFileOperations()
+
+const { toast, showClearConfirm, showToast } = useNotifications()
+
+watch(
+   selectedPaths,
+   (newSelection) => {
+      if (currentPath.value) {
+         updateSelections(currentPath.value, Array.from(newSelection))
+      }
+   },
+   { deep: true }
+)
+
+async function handleSaveBundle() {
+   try {
+      const bundle = await createBundle()
+      if (!bundle) return
+
+      showToast('Bundle created successfully!', 'success')
+   } catch (err) {
+      showToast('Failed to create bundle', 'error')
+   }
 }
+
+function handleClearHistory() {
+   showClearConfirm.value = true
+}
+
+function removeItem(path: string) {
+   if (currentPath.value === path) {
+      currentPath.value = null
+      selectedPaths.value.clear()
+      filteredItems.value = []
+   }
+}
+
+async function handlePreviewBundle() {
+   try {
+      showPreview.value = true
+      const bundle = await createBundle(true)
+      if (!bundle) return
+
+      currentBundleContent.value = bundle.bundleContent
+      previewContent.value = bundle.bundleContent
+   } catch (err) {
+      showToast('Failed to generate preview', 'error')
+   }
+}
+
+onMounted(async () => {
+   await getCurrentWebview().onDragDropEvent((event) => {
+      if (event.payload.type === 'drop') {
+         event.payload.paths.forEach((path) => {
+            selectFolder(path)
+         })
+      }
+   })
+})
+
+const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
 </script>
 
 <template>
-  <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
+   <div class="flex h-screen bg-body">
+      <!-- Sidebar -->
+      <Sidebar
+         :clearCache="clearCache"
+         :current-path="currentPath"
+         :refreshCurrentFolder="refreshCurrentFolder"
+         @open-folder="selectFolder"
+         @open-settings="showSettings = true"
+         @remove-item="removeItem"
+         @clear-history="handleClearHistory" />
 
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
-    </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+         <!-- Header -->
+         <div class="bg-body border-b">
+            <div class="max-w-screen-xl mx-auto px-6 py-4">
+               <div class="flex items-center justify-between">
+                  <div class="flex items-center justify-between w-full space-x-4">
+                     <div class="flex items-center gap-3">
+                        <Button
+                           variant="secondary"
+                           text="Choose Folder"
+                           icon="lucide:folder"
+                           :disabled="isProcessing"
+                           @click="() => selectFolder(null)" />
 
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
-  </main>
+                        <!-- Error Message -->
+                        <div v-if="error" class="flex items-center text-danger">
+                           <Icon icon="lucide:circle-alert" class="w-4 h-4 mr-2" />
+                           {{ error }}
+                        </div>
+                     </div>
+
+                     <div class="ml-auto flex items-center gap-5">
+                        <!-- File counts and lines -->
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                           <span v-if="selectedPaths.size">
+                              {{ selectedPaths.size }} file{{ selectedPaths.size === 1 ? '' : 's' }}
+                           </span>
+                           <span class="w-px h-4 bg-gray-500" v-if="selectedPaths.size"></span>
+                           <span v-if="totalLines" class="flex items-center gap-1">
+                              {{ totalLines.toLocaleString() }} line{{
+                                 totalLines === 1 ? '' : 's'
+                              }}
+                           </span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex items-center gap-2" v-if="hasSelectedItems">
+                           <Button
+                              variant="secondary"
+                              icon="lucide:eye"
+                              :disabled="isProcessing"
+                              @click="() => handlePreviewBundle()" />
+                           <Button
+                              variant="primary"
+                              text="Create Bundle"
+                              :disabled="isProcessing"
+                              @click="handleSaveBundle" />
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- File Tree -->
+         <div class="flex-1 overflow-y-auto web-scrollbar bg-body">
+            <div class="max-w-screen-xl mx-auto px-6 py-4">
+               <div
+                  v-if="isLoadingFolder"
+                  class="text-center flex justify-center items-center mt-10 text-fs-5">
+                  <Icon icon="svg-spinners:180-ring" class="animate-spin" />
+               </div>
+               <div v-else-if="items.length">
+                  <SearchFilesFilter
+                     :items="items"
+                     @update:filteredItems="filteredItems = $event" />
+
+                  <FileTreeView :items="filteredItems" v-model:selected-paths="selectedPaths" />
+               </div>
+               <div v-else class="text-center py-12">
+                  <div class="rounded-lg border-2 border-dashed p-12">
+                     <div class="text-gray-500">
+                        {{
+                           currentPath ? 'This folder is empty' : 'Choose a folder to get started'
+                        }}
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Settings Modal -->
+      <SettingsModal v-model:show="showSettings" />
+
+      <!-- Toast Notification -->
+      <ToastNotification
+         v-model:show="toast.show"
+         :message="toast.message"
+         :type="toast.type"
+         :duration="3000"
+         @update:show="toast.show = $event" />
+
+      <!-- Preview Modal -->
+      <PreviewModal
+         v-model:show="showPreview"
+         :content="previewContent"
+         @save="showPreview = false" />
+   </div>
 </template>
 
-<style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
-}
-
-</style>
 <style>
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+.fade-enter-active,
+.fade-leave-active {
+   transition: opacity 0.3s ease;
 }
 
-.container {
-  margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
+.fade-enter-from,
+.fade-leave-to {
+   opacity: 0;
 }
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
-}
-
 </style>

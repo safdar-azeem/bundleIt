@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "bundleit",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "identifier": "com.bundleit.app",
   "build": {
     "beforeDevCommand": "yarn dev",
@@ -13,10 +13,11 @@
     "windows": [
       {
         "title": "bundleit",
-        "minWidth": 1050,
-        "minHeight": 700,
-        "width": 1100,
-        "height": 770
+        "minWidth": 1010,
+        "minHeight": 680,
+        "width": 1030,
+        "height": 700,
+        "center": true
       }
     ],
     "security": {

@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "author": {
+    "name": "Safdar Azeem",
+    "email": "safdarazeem00@gmail.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -10,15 +14,45 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "vue": "^3.3.4",
     "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-shell": "^2"
+    "@tauri-apps/plugin-dialog": "~2",
+    "@tauri-apps/plugin-fs": "~2",
+    "@tauri-apps/plugin-shell": "^2",
+    "vue": "^3.3.4"
   },
   "devDependencies": {
+    "@iconify/vue": "^4.1.2",
+    "@tauri-apps/cli": "^2",
     "@vitejs/plugin-vue": "^5.0.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
     "typescript": "^5.2.2",
     "vite": "^5.3.1",
-    "vue-tsc": "^2.0.22",
-    "@tauri-apps/cli": "^2"
+    "vue-tsc": "^2.0.22"
+  },
+  "keywords": [
+    "BundleIt.",
+    "bundler",
+    "combine-files",
+    "file-management",
+    "desktop-app",
+    "codegen",
+    "bundle files",
+    "tauri",
+    "vue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/safdar-azeem/bundleit.git"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "tabWidth": 3,
+    "endOfLine": "auto",
+    "bracketSameLine": true
   }
 }

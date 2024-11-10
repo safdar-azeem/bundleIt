@@ -1,16 +1,73 @@
-# Tauri + Vue + TypeScript
+# BundleIt 📦
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Struggling to share large projects with AI like Claude or ChatGPT? BundleIt makes it easy. Get more accurate, context-aware responses from AI—because better input means better output.
 
-## Recommended IDE Setup
+## Features ✨
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- 🔒 100% offline processing - all data stays on your machine
+- 📂 Easy file/folder selection with tree view
+- 🔍 Live preview before bundling
+- ⚡ Fast file processing with smart caching
+- 🔎 File search and filtering
+- 🎯 Drag and drop support
+- 💾 Recent folders history
 
-## Type Support For `.vue` Imports in TS
+<br>
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+![BundleIt Screenshot](public/bundleit.png)
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+## Installation 🚀
+
+### Download
+
+Download the latest version for your platform:
+- [macOS (.dmg)](releases/latest/macos)
+- [Windows (.exe)](releases/latest/windows)
+
+### Build from Source
+
+1. Prerequisites:
+```bash
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Install Node.js (16+) and Yarn
+npm install -g yarn
+```
+
+2. Clone & Install:
+```bash
+# Clone repository
+git clone https://github.com/safdar-azeem/bundleit.git
+cd bundleit
+
+# Install dependencies
+yarn install
+```
+
+3. Development:
+```bash
+# Run in development mode
+yarn tauri dev
+
+# Build for production
+yarn tauri build
+```
+
+## Development Stack 🛠️
+
+- [Tauri 2.0](https://tauri.app/) - Framework
+- [Vue 3](https://vuejs.org/) - Frontend
+- [Rust](https://www.rust-lang.org/) - Backend
+- [TypeScript](https://www.typescriptlang.org/) - Type Safety
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+
+## Support 💬
+
+If you encounter any issues or have questions:
+- [Open an issue](https://github.com/yourusername/bundleit/issues)
+- [Check existing issues](https://github.com/yourusername/bundleit/issues?q=is%3Aissue)
+
+---
+Made with ❤️ by [Safdar Azeem](https://github.com/safdar-azeem)

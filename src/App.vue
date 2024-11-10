@@ -18,6 +18,7 @@ const previewContent = ref('')
 const showPreview = ref(false)
 const currentBundleContent = ref('')
 const filteredItems = ref<any[]>([])
+const isSearching = ref(false)
 
 const {
    currentPath,
@@ -173,9 +174,12 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                <div v-else-if="items.length">
                   <SearchFilesFilter
                      :items="items"
+                     @update:isSearching="isSearching = $event"
                      @update:filteredItems="filteredItems = $event" />
-
-                  <FileTreeView :items="filteredItems" v-model:selected-paths="selectedPaths" />
+                  <FileTreeView
+                     :items="filteredItems"
+                     v-model:selected-paths="selectedPaths"
+                     :isSearching="isSearching" />
                </div>
                <div v-else class="text-center py-12">
                   <div class="rounded-lg border-2 border-dashed p-12">

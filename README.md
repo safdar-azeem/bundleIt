@@ -22,8 +22,8 @@ Struggling to share large projects with AI like Claude or ChatGPT? BundleIt make
 ### Download
 
 Download the latest version for your platform:
-- [macOS (.dmg)](releases/latest/macos)
-- [Windows (.exe)](releases/latest/windows)
+- [macOS (.dmg)](releases/tag/v0.1.0)
+- [Windows (.exe)](releases/tag/v0.1.0)
 
 ### Build from Source
 

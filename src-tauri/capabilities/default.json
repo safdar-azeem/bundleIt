@@ -39,6 +39,8 @@
     "fs:allow-appdata-read-recursive",
     "fs:allow-exe-read-recursive",
     "core:window:default",
-    "core:window:allow-start-dragging"
+    "core:window:allow-start-dragging",
+    "shell:allow-execute",
+    "shell:default"
   ]
 }

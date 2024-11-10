@@ -2,9 +2,41 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
-    "shell:allow-open"
+    "shell:allow-open",
+    "dialog:default",
+    "fs:default",
+    "fs:allow-app-write",
+    "fs:allow-app-write-recursive",
+    "fs:allow-write",
+    "fs:allow-write-text-file",
+    "fs:allow-download-write",
+    "fs:allow-app-read",
+    "fs:read-all",
+    "fs:read-meta",
+    "fs:allow-app-read-recursive",
+    "fs:allow-appcache-read",
+    "fs:allow-appcache-read-recursive",
+    "fs:allow-appconfig-read",
+    "fs:allow-read",
+    "fs:allow-runtime-read-recursive",
+    "fs:allow-resource-read-recursive",
+    "fs:allow-log-read-recursive",
+    "fs:allow-data-read-recursive",
+    "fs:allow-font-read-recursive",
+    "fs:allow-home-read-recursive",
+    "fs:allow-temp-read-recursive",
+    "fs:allow-audio-read-recursive",
+    "fs:allow-cache-read-recursive",
+    "fs:allow-video-read-recursive",
+    "fs:allow-applog-read-recursive",
+    "fs:allow-config-read-recursive",
+    "fs:allow-public-read-recursive",
+    "fs:allow-appdata-read-recursive",
+    "fs:allow-exe-read-recursive"
   ]
 }

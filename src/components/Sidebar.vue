@@ -14,6 +14,7 @@ const props = defineProps<{
 const emit = defineEmits<{
    'open-folder': [path: string]
    'open-settings': []
+   'clear-history': []
    'remove-item': [path: string]
 }>()
 
@@ -48,9 +49,12 @@ function toggleSort() {
    sortBy.value = sortBy.value === 'name' ? 'date' : 'name'
 }
 
-function handleClearHistory() {
-   if (confirm('Are you sure you want to clear all history?')) {
+async function handleClearHistory() {
+   const isConfirmed = await confirm('Are you sure you want to clear all history?')
+   console.log('isConfirmed', isConfirmed)
+   if (isConfirmed) {
       clearHistory()
+      emit('clear-history')
    }
 }
 
@@ -61,9 +65,9 @@ function handleRemoveItem(path: string) {
 </script>
 
 <template>
-   <div class="w-64 bg-body border-r flex flex-col h-screen">
+   <div class="w-64 bg-body border-r flex flex-col h-screen select-none">
       <!-- App Logo and Name -->
-      <div class="p-5 bg-white border-b -text-fs-0.5 mt-0.5 flex items-center gap-3">
+      <div class="p-5 bg-white border-b -text-fs-0.5 mt-0.5 flex items-center gap-3 cursor-pointer">
          <Icon icon="lucide:layers" class="w-7 h-7.5 text-black" />
          <h1 class="font-semibold text-fs-5 text-gray-900 select-none">BundleIt</h1>
       </div>

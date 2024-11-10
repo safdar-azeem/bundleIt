@@ -37,6 +37,8 @@
     "fs:allow-config-read-recursive",
     "fs:allow-public-read-recursive",
     "fs:allow-appdata-read-recursive",
-    "fs:allow-exe-read-recursive"
+    "fs:allow-exe-read-recursive",
+    "core:window:default",
+    "core:window:allow-start-dragging"
   ]
 }

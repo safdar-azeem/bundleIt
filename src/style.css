@@ -1,0 +1,319 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+   :root,
+   .light {
+      --body: 255 255 255;
+      --white: 255 255 255;
+      --black: 34 34 34;
+
+      --gray-50: 248 248 248;
+      --gray-100: 242 245 247;
+      --gray-150: 245 246 247;
+      --gray-200: 241 242 243;
+      --gray-250: 238 241 243;
+      --gray-300: 236 237 238;
+      --gray-350: 230 231 232;
+      --gray-400: 223 228 231;
+      --gray-450: 211 213 215;
+      --gray-500: 191 194 195;
+      --gray-550: 184 186 187;
+      --gray-600: 164 166 167;
+      --gray-650: 145 146 147;
+      --gray-700: 129 130 131;
+      --gray-750: 117 119 120;
+      --gray-800: 105 107 108;
+      --gray-850: 63 63 64;
+      --gray-900: 23 24 24;
+      --border: var(--gray-350);
+
+      --primary-light: 245 245 245;
+      --primary: 18 18 18;
+      --primary-dark: 0 0 0;
+      --primary-fg: 255 255 255;
+      --primary-fg-light: 229 229 229;
+
+      --success-light: 235 245 234;
+      --success: 39 151 26;
+      --success-dark: 39 139 26;
+      --success-fg: 252 252 252;
+
+      --danger-light: 245 233 233;
+      --danger: 232 79 88;
+      --danger-dark: 214 74 82;
+      --danger-fg: 255 255 255;
+
+      --warning-light: 255 248 230;
+      --warning: 255 193 7;
+      --warning-dark: 240 173 0;
+      --warning-fg: 33 37 41;
+
+      --info-light: 229 246 253;
+      --info: 3 169 244;
+      --info-dark: 2 136 209;
+      --info-fg: 255 255 255;
+
+      --secondary: var(--gray-200);
+      --secondary-fg: var(--gray-900);
+      --secondary-dark: var(--black);
+
+      --screen: 100dvh;
+      --rounded-sm: 0.26em;
+      --rounded-md: 0.485em;
+      --rounded-lg: 0.85em;
+      --rounded-xl: 1.3em;
+
+      --size-xs: 1.98em;
+      --size-sm: 2.425em;
+      --size-md: 2.7em;
+      --size-lg: 3.1em;
+      --size-xl: 3.5em;
+      --size-2xl: 4.2em;
+      --size-D: var(--size-md);
+
+      --row-gap: 16px;
+      --row-gap-xs: 6px;
+      --row-gap-sm: 10px;
+      --row-gap-lg: 28px;
+      --row-gap-xl: 40px;
+      --row-gap-2xl: 60px;
+      --row-gap-3xl: 80px;
+      --row-gap-4xl: 95px;
+
+      --col-gap: 16px;
+      --col-gap-xs: 6px;
+      --col-gap-sm: 10px;
+      --col-gap-lg: 28px;
+      --col-gap-xl: 40px;
+      --col-gap-2xl: 55px;
+      --col-gap-3xl: 75px;
+      --col-gap-4xl: 90px;
+
+      --shadow-dropdown: 0px 4px 16px -4px rgba(97, 101, 107, 0.15);
+      --shadow-offcanvas: -24px 1px 24px -7px rgba(43, 44, 44, 0.06);
+      --shadow-card: 0 2px 75px -25px rgba(0, 0, 0, 0.11);
+      --shadow-DEFAULT: 0 3px 20px -5px rgba(0, 0, 0, 0.11);
+      --shadow-lg: 0 5px 40px -10px rgba(0, 0, 0, 0.07);
+      --shadow-xl: 0 6px 35px -7px rgba(0, 0, 0, 0.12);
+   }
+
+   .dark {
+      --body: 24 24 24;
+      --white: 24 24 24;
+      --black: 245 245 245;
+
+      --gray-50: 24 24 24;
+      --gray-100: 30 30 30;
+      --gray-150: 36 36 36;
+      --gray-200: 42 42 42;
+      --gray-250: 48 48 48;
+      --gray-300: 54 54 54;
+      --gray-350: 64 64 64;
+      --gray-400: 80 80 80;
+      --gray-450: 96 96 96;
+      --gray-450: 211 213 215;
+      --gray-550: 128 128 128;
+      --gray-600: 144 144 144;
+      --gray-650: 160 160 160;
+      --gray-700: 176 176 176;
+      --gray-750: 192 192 192;
+      --gray-800: 208 208 208;
+      --gray-850: 224 224 224;
+      --gray-900: 240 240 240;
+      --border: var(--gray-250);
+
+      /* Neutral primary colors */
+      --primary-light: 38 38 38;
+      --primary: 229 229 229;
+      --primary-dark: 245 245 245;
+      --primary-fg: 18 18 18;
+      --primary-fg-light: 26 26 26;
+
+      --shadow-dropdown: 0px 0px 1px theme('colors.gray.700');
+      --shadow-offcanvas: 0px 0px 1px theme('colors.gray.700');
+      --shadow-card: 0px 0px 1px theme('colors.gray.700');
+      --shadow-DEFAULT: 0px 0px 1px theme('colors.gray.700');
+      --shadow-lg: 0px 0px 1px theme('colors.gray.700');
+      --shadow-xl: 0px 0px 1px theme('colors.gray.700');
+   }
+}
+
+*,
+*::before,
+*::after {
+   box-sizing: border-box;
+   letter-spacing: -0.01px;
+}
+
+html {
+   scroll-behavior: smooth;
+}
+
+@layer base {
+   h1,
+   .h1,
+   h2,
+   .h2,
+   h3,
+   .h3,
+   h4,
+   .h4 {
+      @apply font-bold text-gray-900;
+   }
+
+   h5,
+   .h5,
+   h6,
+   .h6 {
+      @apply font-sans text-gray-900;
+   }
+
+   h1,
+   .h1 {
+      @apply text-fs-12 sm:text-fs-13;
+      line-height: 1.3em;
+   }
+   h2,
+   .h2 {
+      @apply text-fs-8 sm:text-fs-8.5;
+      line-height: 1.3em;
+   }
+   h3,
+   .h3 {
+      @apply text-fs-6 sm:text-fs-7;
+      line-height: 1.25em;
+   }
+   h4,
+   .h4 {
+      @apply text-fs-4.5 sm:text-fs-5;
+   }
+   h5,
+   .h5 {
+      @apply text-fs-4 font-semibold;
+   }
+   h6,
+   .h6 {
+      @apply text-fs-2 font-medium;
+   }
+
+   :root {
+      scroll-behavior: smooth;
+   }
+
+   body,
+   html {
+      @apply font-body text-gray-800;
+      font-family: 'Roboto', sans-serif;
+   }
+
+   b {
+      @apply text-gray-900;
+   }
+
+   p {
+      @apply text-fs-2;
+   }
+
+   small {
+      @apply -text-fs-2;
+   }
+
+   .br {
+      @apply block my-2;
+   }
+
+   *,
+   ::before,
+   ::after {
+      @apply border-border;
+   }
+
+   a,
+   input,
+   button,
+   textarea,
+   select {
+      &:focus {
+         @apply outline-primary;
+      }
+   }
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+   -moz-appearance: textfield;
+}
+
+/* Hide the stepper controls */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+   -webkit-text-fill-color: theme('colors.gray.900');
+   -webkit-box-shadow: 0 0 0px 1000px theme('colors.body') inset;
+   transition: background-color 5000s ease-in-out 0s;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+   opacity: 0;
+}
+
+input[type='date']::-webkit-inner-spin-button,
+input[type='date']::-webkit-calendar-picker-indicator {
+   display: none;
+   -webkit-appearance: none;
+}
+
+input,
+textarea {
+   &:focus {
+      outline: none;
+   }
+   &:autofill {
+      @apply bg-body rounded;
+   }
+}
+
+@layer utilities {
+   .web-scrollbar {
+      scrollbar-width: 5px;
+      scrollbar-color: transparent;
+   }
+   .web-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+   }
+
+   .web-scrollbar::-webkit-scrollbar-thumb {
+      @apply bg-gray-500;
+      border-radius: 10px;
+   }
+
+   .web-scrollbar::-webkit-scrollbar-thumb:hover {
+      @apply bg-gray-500;
+   }
+
+   .web-scrollbar::-webkit-scrollbar-track {
+      background-color: transparent;
+   }
+}

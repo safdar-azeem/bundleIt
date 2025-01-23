@@ -99,6 +99,10 @@ onMounted(async () => {
    })
 })
 
+function handleUnselectAll() {
+   selectedPaths.value.clear()
+}
+
 const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
 </script>
 
@@ -128,6 +132,12 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                            icon="lucide:folder"
                            :disabled="isProcessing"
                            @click="() => selectFolder(null)" />
+                        <Button
+                           v-if="selectedPaths.size"
+                           variant="secondary"
+                           icon="lucide:x-circle"
+                           :disabled="isProcessing"
+                           @click="handleUnselectAll" />
 
                         <!-- Error Message -->
                         <div v-if="error" class="flex items-center text-danger">
@@ -201,7 +211,7 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
       </div>
 
       <!-- Settings Modal -->
-      <SettingsModal v-model:show="showSettings" />
+      <SettingsModal v-model:show="showSettings" :currentPath="currentPath" />
 
       <!-- Toast Notification -->
       <ToastNotification

@@ -21,7 +21,7 @@ export function useFileOperations() {
    const isLoadingFolder = ref(false)
    const { setCached, getCached, clearCache } = useCache()
 
-   const { settings } = useSettings()
+   const { settings, getProjectSettings } = useSettings()
    const { addToHistory, updateSelections, getSelections } = useHistory()
 
    async function readDirRecursively(
@@ -138,9 +138,15 @@ export function useFileOperations() {
          const folderName = pathParts[pathParts.length - 1] || 'bundle'
          let bundleContent = `Listing the contents of the "${folderName}" folder:\n`
 
-         // Add pre-text
+         // Add global pre-text
          if (settings.value.preText) {
-            bundleContent += settings.value.preText + '\n\n' + '='.repeat(60) + '\n'
+            bundleContent += '\n' + settings.value.preText + '\n\n' + '='.repeat(60) + '\n'
+         }
+
+         // Add project pre-text
+         const projectSettings = getProjectSettings(currentPath.value)
+         if (projectSettings.preText) {
+            bundleContent += '\n' + projectSettings.preText + '\n\n' + '='.repeat(60) + '\n'
          }
 
          // Process each selected file
@@ -159,10 +165,16 @@ export function useFileOperations() {
             }
          }
 
-         // Add after-text
+         // Add global after-text
          if (settings.value.afterText) {
             bundleContent += '\n\n' + '='.repeat(60) + '\n'
             bundleContent += settings.value.afterText
+         }
+
+         // Add project after-text
+         if (projectSettings.afterText) {
+            bundleContent += '\n\n' + '='.repeat(60) + '\n'
+            bundleContent += projectSettings.afterText
          }
 
          if (showPreview) {

@@ -56,6 +56,13 @@ watch(
 
 <template>
    <div class="sticky top-0 bg-white z-10 pb-2">
-      <Input v-model="searchQuery" icon="lucide:search" placeholder="Search files..." size="sm" />
+      <Input
+         v-model="searchQuery"
+         icon="lucide:search"
+         placeholder="Search files..."
+         size="sm"
+         :autocomplete="'off'"
+         :spellcheck="false"
+         :autocorrect="'off'" />
    </div>
 </template>

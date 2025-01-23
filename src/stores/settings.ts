@@ -5,6 +5,13 @@ interface Settings {
    afterText: string
    excludes: string[]
    showHiddenFiles: boolean
+   projectSettings: Record<
+      string,
+      {
+         preText: string
+         afterText: string
+      }
+   >
 }
 
 const DEFAULT_EXCLUDES = [
@@ -43,6 +50,7 @@ const defaultSettings: Settings = {
    afterText: '',
    excludes: DEFAULT_EXCLUDES,
    showHiddenFiles: false,
+   projectSettings: {},
 }
 
 const loadSettings = (): Settings => {
@@ -82,11 +90,37 @@ export const useSettings = () => {
       settings.value.excludes = [...DEFAULT_EXCLUDES]
    }
 
+   const updateProjectSettings = (
+      path: string,
+      projectSettings: { preText: string; afterText: string }
+   ) => {
+      if (!settings.value.projectSettings) {
+         settings.value.projectSettings = {}
+      }
+      settings.value.projectSettings[path] = projectSettings
+   }
+
+   const getProjectSettings = (path: string) => {
+      settings.value = loadSettings()
+
+      return settings.value.projectSettings?.[path] || { preText: '', afterText: '' }
+   }
+
+   watch(
+      () => settings.value.projectSettings,
+      (newSettings) => {
+         localStorage.setItem('bundleit-settings', JSON.stringify(settings.value))
+      },
+      { deep: true }
+   )
+
    return {
       settings,
       addExclude,
       removeExclude,
       resetExcludes,
       DEFAULT_EXCLUDES,
+      updateProjectSettings,
+      getProjectSettings,
    }
 }

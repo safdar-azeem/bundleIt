@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-   <div>
+   <div class="cursor-pointer">
       <Icon
          :icon="
             isIndeterminate

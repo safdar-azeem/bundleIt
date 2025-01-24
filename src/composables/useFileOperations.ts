@@ -9,7 +9,9 @@ import { open, save } from '@tauri-apps/plugin-dialog'
 import { getPathMatcher, PathMatcher } from '../utils/gitignore'
 import { readTextFile, writeTextFile, readDir } from '@tauri-apps/plugin-fs'
 
-const MAX_DEPTH = 6 // Maximum depth for directory traversal
+const INITIAL_DEPTH = 1
+const MAX_DEPTH = 7
+const PARALLEL_LIMIT = 7
 
 export function useFileOperations() {
    const currentPath = ref<string>('')
@@ -19,65 +21,95 @@ export function useFileOperations() {
    const error = ref<string | null>(null)
    const fileLinesCounts = ref<Map<string, number>>(new Map())
    const isLoadingFolder = ref(false)
+   const isLoadingBackground = ref(false)
    const { setCached, getCached, clearCache } = useCache()
-
    const { settings, getProjectSettings } = useSettings()
    const { addToHistory, updateSelections, getSelections } = useHistory()
 
-   async function readDirRecursively(
+   async function processEntriesParallel(
+      entries: Awaited<ReturnType<typeof readDir>>,
       dirPath: string,
-      currentDepth: number = 0,
+      currentDepth: number,
       pathMatcher?: PathMatcher
    ): Promise<FileNode[]> {
-      // Check cache first
-      const cachedData = getCached(dirPath)
-      if (cachedData) {
-         return cachedData
-      }
+      const chunks = Array.from(entries).reduce((acc, curr, i) => {
+         const chunkIndex = i % PARALLEL_LIMIT
+         if (!acc[chunkIndex]) acc[chunkIndex] = []
+         acc[chunkIndex].push(curr)
+         return acc
+      }, [] as (typeof entries)[])
 
-      if (currentDepth >= MAX_DEPTH) {
-         return []
-      }
+      const processedChunks = await Promise.all(
+         chunks.map(async (chunk) => {
+            const processedEntries = await Promise.all(
+               chunk.map(async (entry) => {
+                  const fullPath = await join(dirPath, entry.name)
+                  if (pathMatcher?.shouldExclude(fullPath)) return null
 
-      try {
-         const entries = await readDir(dirPath)
-         const processedEntries: FileNode[] = []
+                  const node: FileNode = {
+                     name: entry.name,
+                     path: fullPath,
+                     isDirectory: entry.isDirectory,
+                     isFile: entry.isFile,
+                     children: undefined,
+                  }
 
-         for (const entry of entries) {
-            const fullPath = await join(dirPath, entry.name)
-
-            if (pathMatcher?.shouldExclude(fullPath)) {
-               continue
-            }
-
-            const node: FileNode = {
-               name: entry.name,
-               path: fullPath,
-               isDirectory: entry.isDirectory,
-               isFile: entry.isFile,
-               children: undefined,
-            }
-
-            if (entry.isDirectory) {
-               node.children = await readDirRecursively(fullPath, currentDepth + 1, pathMatcher)
-            }
-
-            processedEntries.push(node)
-         }
-
-         const sortedEntries = processedEntries.sort((a, b) => {
-            if (a.isDirectory === b.isDirectory) {
-               return a.name.localeCompare(b.name)
-            }
-            return a.isDirectory ? -1 : 1
+                  if (entry.isDirectory && currentDepth < MAX_DEPTH) {
+                     if (currentDepth < INITIAL_DEPTH) {
+                        node.children = await readDirRecursively(
+                           fullPath,
+                           currentDepth + 1,
+                           pathMatcher
+                        )
+                     } else {
+                        node.children = []
+                        queueBackgroundLoad(node, fullPath, currentDepth + 1, pathMatcher)
+                     }
+                  }
+                  return node
+               })
+            )
+            return processedEntries.filter((entry): entry is FileNode => entry !== null)
          })
+      )
 
-         setCached(dirPath, sortedEntries)
-         return sortedEntries
-      } catch (err) {
-         console.error(`Error reading directory ${dirPath}:`, err)
-         return []
+      return processedChunks.flat()
+   }
+
+   const backgroundQueue = ref<Array<() => Promise<void>>>([])
+   let isProcessingQueue = false
+
+   function queueBackgroundLoad(
+      node: FileNode,
+      dirPath: string,
+      depth: number,
+      pathMatcher?: PathMatcher
+   ) {
+      const task = async () => {
+         try {
+            const children = await readDirRecursively(dirPath, depth, pathMatcher)
+            node.children = children
+            items.value = [...items.value]
+         } catch (err) {
+            console.error(`Background loading error for ${dirPath}:`, err)
+         }
       }
+      backgroundQueue.value.push(task)
+      processBackgroundQueue()
+   }
+
+   async function processBackgroundQueue() {
+      if (isProcessingQueue || backgroundQueue.value.length === 0) return
+      isProcessingQueue = true
+      isLoadingBackground.value = true
+
+      while (backgroundQueue.value.length > 0) {
+         const tasks = backgroundQueue.value.splice(0, PARALLEL_LIMIT)
+         await Promise.all(tasks.map((task) => task()))
+      }
+
+      isProcessingQueue = false
+      isLoadingBackground.value = false
    }
 
    async function selectFolder(path?: string) {
@@ -118,12 +150,53 @@ export function useFileOperations() {
       try {
          const pathMatcher = await getPathMatcher(dirPath, settings.value.excludes)
 
-         const processedEntries = await readDirRecursively(dirPath, 0, pathMatcher)
-         items.value = processedEntries
+         // Load initial depth (top 2 levels) first
+         const initialEntries = await readDirRecursively(dirPath, 0, pathMatcher)
+         items.value = initialEntries
+
+         // Continue loading the rest of the directories in the background
+         const loadRemainingEntries = async () => {
+            const remainingEntries = await readDirRecursively(dirPath, 0, pathMatcher)
+            items.value = remainingEntries
+         }
+
+         loadRemainingEntries()
       } catch (err) {
          console.error('Error loading directory:', err)
          error.value = 'Failed to load directory contents'
          throw err
+      }
+   }
+
+   async function readDirRecursively(
+      dirPath: string,
+      currentDepth: number = 0,
+      pathMatcher?: PathMatcher
+   ): Promise<FileNode[]> {
+      const cachedData = getCached(dirPath)
+      if (cachedData) return cachedData
+
+      if (currentDepth >= MAX_DEPTH) return []
+
+      try {
+         const entries = await readDir(dirPath)
+         const processedEntries = await processEntriesParallel(
+            entries,
+            dirPath,
+            currentDepth,
+            pathMatcher
+         )
+
+         const sortedEntries = processedEntries.sort((a, b) => {
+            if (a.isDirectory === b.isDirectory) return a.name.localeCompare(b.name)
+            return a.isDirectory ? -1 : 1
+         })
+
+         setCached(dirPath, sortedEntries)
+         return sortedEntries
+      } catch (err) {
+         console.error(`Error reading directory ${dirPath}:`, err)
+         return []
       }
    }
 

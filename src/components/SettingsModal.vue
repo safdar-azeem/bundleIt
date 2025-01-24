@@ -177,6 +177,7 @@ const close = () => {
                            class="bg-gray-100 rounded-full px-3 py-1 flex items-center gap-2">
                            <span class="text-sm">{{ pattern }}</span>
                            <Button
+                              v-if="!DEFAULT_EXCLUDES.includes(pattern)"
                               variant="secondary"
                               icon="lucide:x"
                               size="sm"

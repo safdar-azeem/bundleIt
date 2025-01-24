@@ -21,7 +21,6 @@ const DEFAULT_EXCLUDES = [
    'bun.lockb',
    '.DS_Store',
    '.bundle',
-   '.env',
    '.idea',
    '.next',
    '.nuxt',
@@ -43,6 +42,7 @@ const DEFAULT_EXCLUDES = [
    'src-tauri/target',
    '/target/',
    '.TAG',
+   '_locales',
 ]
 
 const defaultSettings: Settings = {

@@ -142,6 +142,9 @@ function handleInput(event: Event) {
             :class="inputClasses"
             class="placeholder:text-gray-750"
             @input="handleInput"
+            :autocomplete="'off'"
+            :spellcheck="false"
+            :autocorrect="'off'"
             @focus="emit('focus', $event)"
             @blur="emit('blur', $event)" />
 
@@ -155,6 +158,9 @@ function handleInput(event: Event) {
             class="placeholder:text-gray-750"
             :class="inputClasses"
             @input="handleInput"
+            :autocomplete="'off'"
+            :spellcheck="false"
+            :autocorrect="'off'"
             @focus="emit('focus', $event)"
             @blur="emit('blur', $event)" />
 

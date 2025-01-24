@@ -213,13 +213,13 @@ export function useFileOperations() {
 
          // Add global pre-text
          if (settings.value.preText) {
-            bundleContent += '\n' + settings.value.preText + '\n\n' + '='.repeat(60) + '\n'
+            bundleContent += '\n' + settings.value.preText + '\n\n' + '='.repeat(50) + '\n'
          }
 
          // Add project pre-text
          const projectSettings = getProjectSettings(currentPath.value)
          if (projectSettings.preText) {
-            bundleContent += '\n' + projectSettings.preText + '\n\n' + '='.repeat(60) + '\n'
+            bundleContent += '\n' + projectSettings.preText + '\n\n' + '='.repeat(50) + '\n'
          }
 
          // Process each selected file
@@ -228,10 +228,15 @@ export function useFileOperations() {
                const relativePath = filePath.replace(currentPath.value, '')
                const normalizedPath = relativePath.replace(/^[/\\]+/, '')
 
-               bundleContent += '\n' + '='.repeat(60) + '\n\n'
-               bundleContent += `File Path: ${normalizedPath}\n`
-
                const content = await readTextFile(filePath)
+               if (!content) {
+                  bundleContent += '\n' + '='.repeat(50) + '\n'
+                  return
+               }
+
+               bundleContent += '\n' + '='.repeat(50) + '\n'
+               bundleContent += `File Path: ${normalizedPath}\n\n`
+
                bundleContent += content
             } catch (err) {
                console.error(`Error processing file ${filePath}:`, err)
@@ -240,13 +245,13 @@ export function useFileOperations() {
 
          // Add global after-text
          if (settings.value.afterText) {
-            bundleContent += '\n\n' + '='.repeat(60) + '\n'
+            bundleContent += '\n\n' + '='.repeat(50) + '\n'
             bundleContent += settings.value.afterText
          }
 
          // Add project after-text
          if (projectSettings.afterText) {
-            bundleContent += '\n\n' + '='.repeat(60) + '\n'
+            bundleContent += '\n\n' + '='.repeat(50) + '\n'
             bundleContent += projectSettings.afterText
          }
 

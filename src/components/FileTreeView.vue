@@ -88,7 +88,12 @@ const getAllFilePaths = (node: FileNode): string[] => {
 }
 
 const shouldShowItem = (item: FileNode) => {
-   if (!settings.value.showHiddenFiles && item.name.startsWith('.')) {
+   const includeDotDir = ['.github', '.env']
+   if (
+      !settings.value.showHiddenFiles &&
+      item.name.startsWith('.') &&
+      !includeDotDir.includes(item.name)
+   ) {
       return false
    }
    return !settings.value.excludes.includes(item.name)
@@ -186,7 +191,7 @@ const toggleSelection = async (node: FileNode) => {
             <div v-if="shouldShowItem(item)" class="file-tree-item">
                <div
                   class="flex items-center p-2 hover:bg-gray-50 cursor-pointer"
-                  @click="toggleSelection(item)">
+                  @click="item?.isDirectory ? toggleNode(item) : toggleSelection(item)">
                   <button
                      v-if="item.isDirectory"
                      class="p-1 rounded hover:bg-gray-200 mr-1"
@@ -205,7 +210,7 @@ const toggleSelection = async (node: FileNode) => {
                      :is-indeterminate="isNodePartiallySelected(item)"
                      :isChecked="isNodeSelected(item)"
                      class="mr-3"
-                     @change="toggleSelection(item)" />
+                     @click.stop="toggleSelection(item)" />
 
                   <Icon
                      :icon="item.isDirectory ? 'lucide:folder' : 'lucide:file'"
@@ -216,7 +221,6 @@ const toggleSelection = async (node: FileNode) => {
 
                   <span class="text-sm text-gray-850">{{ item.name }}</span>
                </div>
-
                <div
                   v-if="item.isDirectory"
                   class="ml-6 mb-1 mt-1 children-container"

@@ -213,13 +213,13 @@ export function useFileOperations() {
 
          // Add global pre-text
          if (settings.value.preText) {
-            bundleContent += '\n' + settings.value.preText + '\n\n' + '='.repeat(50) + '\n'
+            bundleContent += '\n' + settings.value.preText + '\n\n' + '='.repeat(55) + '\n'
          }
 
          // Add project pre-text
          const projectSettings = getProjectSettings(currentPath.value)
          if (projectSettings.preText) {
-            bundleContent += '\n' + projectSettings.preText + '\n\n' + '='.repeat(50) + '\n'
+            bundleContent += '\n' + projectSettings.preText + '\n\n' + '='.repeat(55) + '\n'
          }
 
          // Process each selected file
@@ -230,11 +230,11 @@ export function useFileOperations() {
 
                const content = await readTextFile(filePath)
                if (!content) {
-                  bundleContent += '\n' + '='.repeat(50) + '\n'
+                  bundleContent += '\n' + '='.repeat(55) + '\n'
                   return
                }
 
-               bundleContent += '\n' + '='.repeat(50) + '\n'
+               bundleContent += '\n' + '='.repeat(55) + '\n'
                bundleContent += `File Path: ${normalizedPath}\n\n`
 
                bundleContent += content
@@ -245,13 +245,13 @@ export function useFileOperations() {
 
          // Add global after-text
          if (settings.value.afterText) {
-            bundleContent += '\n\n' + '='.repeat(50) + '\n'
+            bundleContent += '\n\n' + '='.repeat(55) + '\n'
             bundleContent += settings.value.afterText
          }
 
          // Add project after-text
          if (projectSettings.afterText) {
-            bundleContent += '\n\n' + '='.repeat(50) + '\n'
+            bundleContent += '\n\n' + '='.repeat(55) + '\n'
             bundleContent += projectSettings.afterText
          }
 

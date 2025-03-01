@@ -197,6 +197,7 @@ const toggleSelection = async (node: FileNode) => {
                      class="p-1 rounded hover:bg-gray-200 mr-1"
                      @click.stop="toggleNode(item)">
                      <Icon
+                        v-if="!isSearching"
                         :icon="
                            expandedNodes.has(item.path)
                               ? 'lucide:chevron-down'

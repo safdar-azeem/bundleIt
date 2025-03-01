@@ -58,12 +58,10 @@ export class PathMatcher {
    shouldExclude(path: string): boolean {
       const relativePath = path.replace(this.rootPath, '').replace(/^[/\\]/, '')
       const pathParts = relativePath.split(/[/\\]/)
+      const lastPart = [...pathParts].pop()?.toLowerCase()
 
-      console.log('pathParts :>> ', pathParts);
-      console.log('relativePath :>> ', relativePath);
-      console.log('excludePatterns :>> ', this.excludePatterns);
+      const isExcluded = this.excludePatterns.some((pattern) => lastPart == pattern.toLowerCase())
 
-      const isExcluded = this.excludePatterns.some((pattern) => )
       if (isExcluded) {
          return true
       }

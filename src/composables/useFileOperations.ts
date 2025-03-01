@@ -10,8 +10,8 @@ import { getPathMatcher, PathMatcher } from '../utils/gitignore'
 import { readTextFile, writeTextFile, readDir } from '@tauri-apps/plugin-fs'
 
 const INITIAL_DEPTH = 1
-const MAX_DEPTH = 7
-const PARALLEL_LIMIT = 7
+const MAX_DEPTH = 8
+const PARALLEL_LIMIT = 50
 
 export function useFileOperations() {
    const currentPath = ref<string>('')

@@ -8,8 +8,8 @@ import { getPathMatcher, PathMatcher } from '../utils/gitignore'
 import { readDir } from '@tauri-apps/plugin-fs'
 
 const INITIAL_DEPTH = 2
-const MAX_DEPTH = 9
-const PARALLEL_LIMIT = 150
+const MAX_DEPTH = 8
+const PARALLEL_LIMIT = 8
 
 export function useDirectoryOperations(
    items: Ref<FileNode[]>,

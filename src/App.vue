@@ -6,16 +6,17 @@ import FileTreeView from './components/FileTreeView.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { useNotifications } from './composables/useNotifications'
-import SearchFilesFilter from './components/SearchFilesFilter.vue'
 import ToastNotification from './components/ToastNotification.vue'
 import { useFileOperations } from './composables/useFileOperations'
 import { computed, watch, ref, onMounted, defineAsyncComponent } from 'vue'
 import WelcomeModal from './components/WelcomeModal.vue'
+import Input from './components/Input.vue'
 
 const showSettings = ref(false)
 const PreviewModal = defineAsyncComponent(() => import('./components/PreviewModal.vue'))
 
 const previewContent = ref('')
+const searchQuery = ref('')
 const showPreview = ref(false)
 const currentBundleContent = ref('')
 const showWelcome = ref(!localStorage.getItem('has-seen-welcome'))
@@ -184,7 +185,16 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                   <Icon icon="svg-spinners:180-ring" class="animate-spin" />
                </div>
                <div v-else-if="items.length">
-                  <SearchFilesFilter />
+                  <div class="sticky top-0 bg-white z-10 pb-2">
+                     <Input
+                        v-model="searchQuery"
+                        icon="lucide:search"
+                        placeholder="Search files..."
+                        size="sm"
+                        :autocomplete="'off'"
+                        :spellcheck="false"
+                        :autocorrect="'off'" />
+                  </div>
                   <FileTreeView :items="items" v-model:selected-paths="selectedPaths" />
                </div>
                <div v-else class="text-center py-12">

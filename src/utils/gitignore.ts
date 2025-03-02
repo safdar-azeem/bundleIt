@@ -13,8 +13,6 @@ export class PathMatcher {
    constructor(rootPath: string, excludePatterns: string[] = []) {
       this.rootPath = rootPath
       this.excludePatterns = excludePatterns
-
-      console.log('this.excludePatterns :>> ', this.excludePatterns)
    }
 
    async initialize(): Promise<void> {

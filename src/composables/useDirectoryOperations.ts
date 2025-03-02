@@ -7,9 +7,9 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { getPathMatcher, PathMatcher } from '../utils/gitignore'
 import { readDir } from '@tauri-apps/plugin-fs'
 
-const INITIAL_DEPTH = 1
-const MAX_DEPTH = 8
-const PARALLEL_LIMIT = 50
+const INITIAL_DEPTH = 2
+const MAX_DEPTH = 9
+const PARALLEL_LIMIT = 150
 
 export function useDirectoryOperations(
    items: Ref<FileNode[]>,
@@ -162,6 +162,9 @@ export function useDirectoryOperations(
 
       try {
          const entries = await readDir(dirPath)
+
+         console.log('entries :>> ', entries)
+
          const processedEntries = await processEntriesParallel(
             entries,
             dirPath,

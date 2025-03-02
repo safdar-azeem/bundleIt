@@ -3,20 +3,21 @@ import { Icon } from '@iconify/vue'
 import Button from './components/Button.vue'
 import Sidebar from './components/Sidebar.vue'
 import FileTreeView from './components/FileTreeView.vue'
+import WelcomeModal from './components/WelcomeModal.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { useNotifications } from './composables/useNotifications'
 import ToastNotification from './components/ToastNotification.vue'
+import SearchFilesFilter from './components/SearchFilesFilter.vue'
 import { useFileOperations } from './composables/useFileOperations'
 import { computed, watch, ref, onMounted, defineAsyncComponent } from 'vue'
-import WelcomeModal from './components/WelcomeModal.vue'
-import Input from './components/Input.vue'
 
 const showSettings = ref(false)
 const PreviewModal = defineAsyncComponent(() => import('./components/PreviewModal.vue'))
 
 const previewContent = ref('')
-const searchQuery = ref('')
+const filteredItems = ref<any[]>([])
+const isSearching = ref(false)
 const showPreview = ref(false)
 const currentBundleContent = ref('')
 const showWelcome = ref(!localStorage.getItem('has-seen-welcome'))
@@ -185,17 +186,14 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                   <Icon icon="svg-spinners:180-ring" class="animate-spin" />
                </div>
                <div v-else-if="items.length">
-                  <div class="sticky top-0 bg-white z-10 pb-2">
-                     <Input
-                        v-model="searchQuery"
-                        icon="lucide:search"
-                        placeholder="Search files..."
-                        size="sm"
-                        :autocomplete="'off'"
-                        :spellcheck="false"
-                        :autocorrect="'off'" />
-                  </div>
-                  <FileTreeView :items="items" v-model:selected-paths="selectedPaths" />
+                  <SearchFilesFilter
+                     :items="items"
+                     @update:isSearching="isSearching = $event"
+                     @update:filteredItems="filteredItems = $event" />
+                  <FileTreeView
+                     :items="filteredItems"
+                     v-model:selected-paths="selectedPaths"
+                     :isSearching="isSearching" />
                </div>
                <div v-else class="text-center py-12">
                   <div class="rounded-lg border-2 border-dashed p-12">

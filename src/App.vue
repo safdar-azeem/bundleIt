@@ -18,8 +18,6 @@ const PreviewModal = defineAsyncComponent(() => import('./components/PreviewModa
 const previewContent = ref('')
 const showPreview = ref(false)
 const currentBundleContent = ref('')
-const filteredItems = ref<any[]>([])
-const isSearching = ref(false)
 const showWelcome = ref(!localStorage.getItem('has-seen-welcome'))
 
 const {
@@ -63,7 +61,6 @@ async function handleSaveBundle() {
 function handleClearHistory() {
    currentPath.value = null
    selectedPaths.value.clear()
-   filteredItems.value = []
    items.value = []
 }
 
@@ -71,7 +68,6 @@ function removeItem(path: string) {
    if (currentPath.value === path) {
       currentPath.value = null
       selectedPaths.value.clear()
-      filteredItems.value = []
       items.value = []
    }
 }
@@ -188,14 +184,8 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                   <Icon icon="svg-spinners:180-ring" class="animate-spin" />
                </div>
                <div v-else-if="items.length">
-                  <SearchFilesFilter
-                     :items="items"
-                     @update:isSearching="isSearching = $event"
-                     @update:filteredItems="filteredItems = $event" />
-                  <FileTreeView
-                     :items="filteredItems"
-                     v-model:selected-paths="selectedPaths"
-                     :isSearching="isSearching" />
+                  <SearchFilesFilter />
+                  <FileTreeView :items="items" v-model:selected-paths="selectedPaths" />
                </div>
                <div v-else class="text-center py-12">
                   <div class="rounded-lg border-2 border-dashed p-12">

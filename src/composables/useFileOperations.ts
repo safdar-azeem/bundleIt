@@ -2,20 +2,19 @@ import { FileNode } from '../types'
 import { ref, computed, watch } from 'vue'
 import { useCache } from '../stores/cache'
 import { useHistory } from '../stores/history'
-import { useSettings } from '../stores/settings'
-import { useDirectoryOperations } from './useDirectoryOperations'
-import { useBundleOperations } from './useBundleOperations'
 import { readTextFile } from '@tauri-apps/plugin-fs'
+import { useBundleOperations } from './useBundleOperations'
+import { useDirectoryOperations } from './useDirectoryOperations'
 
 export function useFileOperations() {
-   const currentPath = ref<string>('')
-   const items = ref<FileNode[]>([])
-   const selectedPaths = ref<Set<string>>(new Set())
    const isProcessing = ref(false)
-   const error = ref<string | null>(null)
-   const fileLinesCounts = ref<Map<string, number>>(new Map())
+   const items = ref<FileNode[]>([])
    const isLoadingFolder = ref(false)
+   const currentPath = ref<string>('')
+   const error = ref<string | null>(null)
+   const selectedPaths = ref<Set<string>>(new Set())
    const { setCached, getCached, clearCache } = useCache()
+   const fileLinesCounts = ref<Map<string, number>>(new Map())
    const { updateSelections, getSelections, addToHistory } = useHistory()
 
    const {

@@ -13,6 +13,8 @@ export class PathMatcher {
    constructor(rootPath: string, excludePatterns: string[] = []) {
       this.rootPath = rootPath
       this.excludePatterns = excludePatterns
+
+      console.log('this.excludePatterns :>> ', this.excludePatterns)
    }
 
    async initialize(): Promise<void> {
@@ -57,39 +59,31 @@ export class PathMatcher {
 
    shouldExclude(path: string): boolean {
       const relativePath = path.replace(this.rootPath, '').replace(/^[/\\]/, '')
-      const pathParts = relativePath.split(/[/\\]/)
-      const lastPart = [...pathParts].pop()?.toLowerCase()
+      const excludePatterns = this.excludePatterns
 
-      const isExcluded = this.excludePatterns.some((pattern) => lastPart == pattern.toLowerCase())
-
-      if (isExcluded) {
-         return true
-      }
-
-      if (this.gitignorePatterns.length === 0) {
-         return false
-      }
-
-      let ignored = false
-
-      for (const { pattern, isNegated, isDirectory } of this.gitignorePatterns) {
-         if (isDirectory && !path.endsWith('/')) {
-            continue
+      return excludePatterns.some((pattern) => {
+         // Handle exact matches and directory patterns
+         if (pattern.startsWith('/')) {
+            // For patterns starting with '/', check if path starts with this pattern
+            return relativePath.startsWith(pattern.slice(1))
+         } else if (pattern.endsWith('/')) {
+            // For patterns ending with '/', check if path includes this directory
+            return relativePath.includes(pattern)
+         } else {
+            // For simple patterns, check if they're present anywhere in the path
+            // Split the path into segments and check each part
+            const pathSegments = relativePath.split(/[/\\]/)
+            return (
+               pathSegments.some((segment) => {
+                  // Exact match for filenames or directory names
+                  if (segment === pattern) return true
+                  // Check for file extensions (like .log)
+                  if (pattern.startsWith('.') && segment.endsWith(pattern)) return true
+                  return false
+               }) || relativePath === pattern
+            ) // Check full relative path match
          }
-
-         const matches =
-            this.matchPattern(pattern, relativePath) ||
-            pathParts.some((part) => this.matchPattern(pattern, part))
-
-         if (matches) {
-            if (isNegated) {
-               return false
-            }
-            ignored = true
-         }
-      }
-
-      return ignored
+      })
    }
 }
 

@@ -42,17 +42,17 @@ export function useBundleOperations(
 
                const content = await readTextFile(filePath)
 
-               if (!content) {
-                  bundleContent += '\n' + '='.repeat(55) + '\n'
-                  return
+               // Skip empty files instead of returning
+               if (!content.trim()) {
+                  bundleContent += ``
+                  continue
                }
 
                bundleContent += '\n' + '='.repeat(55) + '\n'
                bundleContent += `File Path: ${normalizedPath}\n\n`
-
                bundleContent += content
             } catch (err) {
-               console.error(`Error processing file ${filePath}:`, err)
+               bundleContent += ``
             }
          }
 

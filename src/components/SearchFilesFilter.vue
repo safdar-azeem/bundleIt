@@ -55,7 +55,7 @@ watch(
 </script>
 
 <template>
-   <div class="sticky top-0 bg-white z-10 pb-2">
+   <div class="sticky top-0 bg-white z-10">
       <Input
          v-model="searchQuery"
          icon="lucide:search"

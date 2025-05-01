@@ -53,7 +53,16 @@ const DEFAULT_EXCLUDES = [
 ]
 
 const defaultSettings: Settings = {
-   preText: '',
+   preText: `please make sure to follow these guidelines:
+
+1. Always provide the complete code for any changes you've made—whether it's a single-line tweak or a full file update.
+
+2. Clearly mention the exact file path of every file you’ve worked on. This helps me quickly locate the files and copy your code into my project without any confusion or extra effort.
+
+3. Maintain the same code style and structure as the rest of the project. Consistency is important for readability and maintainability.
+
+4. Follow the DRY (Don’t Repeat Yourself) principle—reuse code where possible to reduce redundancy and simplify maintenance.
+`,
    afterText: '',
    excludes: DEFAULT_EXCLUDES,
    showHiddenFiles: false,
@@ -110,7 +119,12 @@ export const useSettings = () => {
    const getProjectSettings = (path: string) => {
       settings.value = loadSettings()
 
-      return settings.value.projectSettings?.[path] || { preText: '', afterText: '' }
+      return (
+         settings.value.projectSettings?.[path] || {
+            preText: '',
+            afterText: '',
+         }
+      )
    }
 
    watch(

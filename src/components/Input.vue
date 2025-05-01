@@ -52,6 +52,10 @@ const props = defineProps({
       type: String,
       default: null,
    },
+   rounded: {
+      type: String as PropType<'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>,
+      default: 'md',
+   },
 })
 
 const emit = defineEmits<{
@@ -80,18 +84,37 @@ const inputClasses = computed(() => {
    }
 
    const hasIcon = props.icon || props.loading
+   const hasClearButton = !props.disabled && !props.loading && hasValue.value
+
    const paddingLeft = {
       sm: hasIcon ? 'pl-8' : 'pl-3',
       md: hasIcon ? 'pl-10' : 'pl-4',
       lg: hasIcon ? 'pl-12' : 'pl-5',
    }
 
+   const paddingRight = {
+      sm: hasClearButton ? 'pr-8' : 'pr-3',
+      md: hasClearButton ? 'pr-10' : 'pr-4',
+      lg: hasClearButton ? 'pr-12' : 'pr-5',
+   }
+
+   const rounded = {
+      none: 'rounded-none',
+      sm: 'rounded-sm',
+      md: 'rounded-md',
+      lg: 'rounded-lg',
+      xl: 'rounded-xl',
+      '2xl': 'rounded-2xl',
+   }
+
    return [
-      'block w-full rounded-md border',
+      'block w-full border',
       'disabled:opacity-50 disabled:cursor-not-allowed',
       variants[props.variant],
       sizes[props.size],
       paddingLeft[props.size],
+      paddingRight[props.size],
+      rounded[props.rounded],
       props.error ? 'border-danger' : '',
    ]
 })
@@ -110,6 +133,19 @@ const iconClasses = computed(() => {
    ]
 })
 
+const clearButtonClasses = computed(() => {
+   const sizes = {
+      sm: 'right-2.5',
+      md: 'right-3',
+      lg: 'right-3.5',
+   }
+
+   return [
+      'absolute top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600',
+      sizes[props.size],
+   ]
+})
+
 const iconSize = computed(
    () =>
       ({
@@ -119,9 +155,20 @@ const iconSize = computed(
       }[props.size])
 )
 
+const hasValue = computed(() => {
+   return props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== ''
+})
+
 function handleInput(event: Event) {
    const target = event.target as HTMLInputElement | HTMLTextAreaElement
    emit('update:modelValue', target.value)
+}
+
+function clearInput() {
+   emit('update:modelValue', '')
+   if (input.value) {
+      input.value.focus()
+   }
 }
 </script>
 
@@ -170,6 +217,14 @@ function handleInput(event: Event) {
             :size="iconSize"
             :class="[iconClasses, 'animate-spin']" />
          <Icon :icon="icon" v-else-if="icon" :size="iconSize" :class="iconClasses" />
+
+         <!-- Clear button (cross icon) -->
+         <Icon
+            v-if="!disabled && !loading && hasValue"
+            icon="mdi:close-circle"
+            :size="iconSize"
+            :class="clearButtonClasses"
+            @click="clearInput" />
       </div>
 
       <p v-if="error" class="mt-1.5 text-sm text-danger">

@@ -114,6 +114,7 @@
       --gray-400: 80 80 80;
       --gray-450: 96 96 96;
       --gray-450: 211 213 215;
+      --gray-500: 177 178 178;
       --gray-550: 128 128 128;
       --gray-600: 144 144 144;
       --gray-650: 160 160 160;
@@ -296,11 +297,11 @@ textarea {
 
 @layer utilities {
    .web-scrollbar {
-      scrollbar-width: 5px;
+      scrollbar-width: 3px;
       scrollbar-color: transparent;
    }
    .web-scrollbar::-webkit-scrollbar {
-      width: 8px;
+      width: 3px;
       height: 8px;
    }
 

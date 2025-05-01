@@ -5,6 +5,7 @@ import { save } from '@tauri-apps/plugin-dialog'
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 
 export function useBundleOperations(
+   folderName: string,
    selectedPaths: Ref<Set<string>>,
    currentPath: Ref<string>,
    isProcessing: Ref<boolean>,
@@ -19,8 +20,6 @@ export function useBundleOperations(
       error.value = null
 
       try {
-         const pathParts = currentPath.value.split(/[/\\]/)
-         const folderName = pathParts[pathParts.length - 1] || 'bundle'
          let bundleContent = `Listing the contents of the "${folderName}" folder:\n`
 
          // Add global pre-text

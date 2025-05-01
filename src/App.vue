@@ -9,6 +9,7 @@ import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { useNotifications } from './composables/useNotifications'
 import ToastNotification from './components/ToastNotification.vue'
 import SearchFilesFilter from './components/SearchFilesFilter.vue'
+import SelectedFilesPanel from './components/SelectedFilesPanel.vue'
 import { useFileOperations } from './composables/useFileOperations'
 import { computed, watch, ref, onMounted, defineAsyncComponent } from 'vue'
 
@@ -21,6 +22,7 @@ const isSearching = ref(false)
 const showPreview = ref(false)
 const currentBundleContent = ref('')
 const showWelcome = ref(!localStorage.getItem('has-seen-welcome'))
+const showSelectedFilesPanel = ref(false)
 
 const {
    currentPath,
@@ -30,10 +32,12 @@ const {
    error,
    isLoadingFolder,
    totalLines,
+   fileLinesCounts,
    clearCache,
    selectFolder,
    createBundle,
    updateSelections,
+   folderName,
    refreshCurrentFolder,
 } = useFileOperations()
 
@@ -101,6 +105,12 @@ function handleUnselectAll() {
    selectedPaths.value.clear()
 }
 
+function toggleSelectedFilesPanel(value) {
+   setTimeout(() => {
+      showSelectedFilesPanel.value = value == false ? false : !showSelectedFilesPanel.value
+   }, 5)
+}
+
 const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
 </script>
 
@@ -111,7 +121,12 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
          :clearCache="clearCache"
          :current-path="currentPath"
          :refreshCurrentFolder="refreshCurrentFolder"
-         @open-folder="selectFolder"
+         @open-folder="
+            ($event) => {
+               selectFolder($event)
+               toggleSelectedFilesPanel(false)
+            }
+         "
          @open-settings="showSettings = true"
          @remove-item="removeItem"
          @clear-history="handleClearHistory" />
@@ -147,10 +162,6 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                      <div class="ml-auto flex items-center gap-5">
                         <!-- File counts and lines -->
                         <div class="flex items-center gap-2 text-sm text-gray-600">
-                           <span v-if="selectedPaths.size">
-                              {{ selectedPaths.size }} file{{ selectedPaths.size === 1 ? '' : 's' }}
-                           </span>
-                           <span class="w-px h-4 bg-gray-500" v-if="selectedPaths.size"></span>
                            <span v-if="totalLines" class="flex items-center gap-1">
                               {{ totalLines.toLocaleString() }} line{{
                                  totalLines === 1 ? '' : 's'
@@ -177,34 +188,59 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
             </div>
          </div>
 
-         <!-- File Tree -->
-         <div class="flex-1 overflow-y-auto web-scrollbar bg-body select-none">
-            <div class="max-w-screen-xl mx-auto px-6 py-4">
-               <div
-                  v-if="isLoadingFolder"
-                  class="text-center flex justify-center items-center mt-10 text-fs-5">
-                  <Icon icon="svg-spinners:180-ring" class="animate-spin" />
-               </div>
-               <div v-else-if="items.length">
-                  <SearchFilesFilter
-                     :items="items"
-                     @update:isSearching="isSearching = $event"
-                     @update:filteredItems="filteredItems = $event" />
-                  <FileTreeView
-                     :items="filteredItems"
-                     v-model:selected-paths="selectedPaths"
-                     :isSearching="isSearching" />
-               </div>
-               <div v-else class="text-center py-12">
-                  <div class="rounded-lg border-2 border-dashed p-12">
-                     <div class="text-gray-500">
-                        {{
-                           currentPath ? 'This folder is empty' : 'Choose a folder to get started'
-                        }}
+         <!-- Main Content + Selected Files Panel -->
+         <div class="flex-1 flex overflow-hidden">
+            <!-- File Tree -->
+            <div class="flex-1 overflow-y-auto web-scrollbar bg-body select-none">
+               <div class="max-w-screen-xl mx-auto px-6 py-4">
+                  <div
+                     v-if="isLoadingFolder"
+                     class="text-center flex justify-center items-center mt-10 text-fs-5">
+                     <Icon icon="svg-spinners:180-ring" class="animate-spin" />
+                  </div>
+                  <div v-else-if="items.length">
+                     <div class="flex justify-between w-full pb-3 gap-2 items-center">
+                        <SearchFilesFilter
+                           :items="items"
+                           class="flex-1"
+                           @update:isSearching="isSearching = $event"
+                           @update:filteredItems="filteredItems = $event" />
+                        <Button
+                           v-if="hasSelectedItems"
+                           variant="secondary"
+                           icon="lucide:list-checks"
+                           :active="showSelectedFilesPanel"
+                           :disabled="isProcessing"
+                           @click="toggleSelectedFilesPanel">
+                           {{ selectedPaths.size }} file{{ selectedPaths.size === 1 ? '' : 's' }}
+                        </Button>
+                     </div>
+                     <FileTreeView
+                        :items="filteredItems"
+                        v-model:selected-paths="selectedPaths"
+                        :isSearching="isSearching" />
+                  </div>
+                  <div v-else class="text-center py-12">
+                     <div class="rounded-lg border-2 border-dashed p-12">
+                        <div class="text-gray-500">
+                           {{
+                              currentPath
+                                 ? 'This folder is empty'
+                                 : 'Choose a folder to get started'
+                           }}
+                        </div>
                      </div>
                   </div>
                </div>
             </div>
+
+            <!-- Selected Files Panel -->
+            <SelectedFilesPanel
+               v-model:show="showSelectedFilesPanel"
+               :selectedPaths="selectedPaths"
+               :fileLinesCounts="fileLinesCounts"
+               :folderName="folderName"
+               @update:selectedPaths="(paths) => (selectedPaths = paths)" />
          </div>
       </div>
 

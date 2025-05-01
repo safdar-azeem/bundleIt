@@ -23,7 +23,13 @@ export function useFileOperations() {
       isLoadingBackground,
    } = useDirectoryOperations(items, currentPath, error)
 
+   const folderName = computed(() => {
+      const pathParts = currentPath.value.split(/[/\\]/)
+      return pathParts[pathParts.length - 1] || 'bundle'
+   })
+
    const { createBundle: createBundleFiles } = useBundleOperations(
+      folderName?.value,
       selectedPaths,
       currentPath,
       isProcessing,
@@ -115,12 +121,14 @@ export function useFileOperations() {
    return {
       items,
       error,
+      folderName,
       currentPath,
       totalLines,
       isProcessing,
       selectedPaths,
       isLoadingFolder,
       isLoadingBackground,
+      fileLinesCounts, // Exposing fileLinesCounts for the SelectedFilesPanel
       updateSelections,
       clearCache,
       selectFolder,

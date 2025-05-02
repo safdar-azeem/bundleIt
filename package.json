@@ -40,6 +40,10 @@
     "desktop-app",
     "codegen",
     "bundle files",
+    "productivity",
+    "source-code-bundler",
+    "context-sharing",
+    "developer-tools",
     "tauri",
     "vue"
   ],

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import Button from './Button.vue'
 
 const props = defineProps<{
@@ -13,11 +13,14 @@ const emit = defineEmits<{
    save: []
 }>()
 
+const overviewContent = ref(`------------------ 🎯 Task Overview ------------------\n\n`)
+
 const isCopyied = ref(false)
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 const copyToClipboard = async () => {
    try {
-      await navigator.clipboard.writeText(props.content)
+      await navigator.clipboard.writeText(overviewContent?.value + `\n\n` + props?.content)
       isCopyied.value = true
       setTimeout(() => {
          isCopyied.value = false
@@ -30,6 +33,16 @@ const copyToClipboard = async () => {
 const close = () => {
    emit('update:show', false)
 }
+
+onMounted(() => {
+   setTimeout(() => {
+      textareaRef.value?.focus()
+   }, 100)
+})
+
+watch([props.show, props.content, textareaRef], () => {
+   textareaRef.value?.focus()
+})
 </script>
 
 <template>
@@ -58,11 +71,19 @@ const close = () => {
          </div>
 
          <!-- Content -->
-         <div class="flex-1 overflow-hidden p-6">
+         <div class="flex-1 overflow-hidden flex flex-col p-6">
             <textarea
-               :value="props.content"
-               class="w-full h-full font-mono text-sm p-4 border rounded resize-none focus:border-primary focus:ring-1 focus:ring-primary web-scrollbar bg-gray-50"
-               :placeholder="'No content to preview'"
+               ref="textareaRef"
+               :autocomplete="'off'"
+               :spellcheck="false"
+               :autocorrect="'off'"
+               :value="overviewContent"
+               @input="overviewContent = ($event.target as any)?.value"
+               :class="`w-full h-[164px] font-mono text-sm p-4 border-x border-t rounded-t resize-none web-scrollbar bg-gray-50`" />
+
+            <textarea
+               :value="props?.content"
+               class="w-full flex-1 font-mono text-sm p-4 border-x rounded-none border-b rounded-b -mt-2 resize-none focus:border-primary focus:ring-1 focus:ring-primary web-scrollbar bg-gray-50"
                disabled />
          </div>
       </div>

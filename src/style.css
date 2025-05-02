@@ -318,3 +318,22 @@ textarea {
       background-color: transparent;
    }
 }
+
+textarea {
+   scrollbar-width: thin !important;
+}
+
+textarea::-webkit-scrollbar {
+   width: 6px !important;
+   height: 6px !important;
+}
+
+textarea::-webkit-scrollbar-track {
+   border-radius: 10px !important;
+}
+
+textarea::-webkit-scrollbar-thumb {
+   border-radius: 10px !important;
+   border: 1px solid transparent !important;
+   background-clip: padding-box !important;
+}

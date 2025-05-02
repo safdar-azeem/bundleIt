@@ -53,21 +53,23 @@ const DEFAULT_EXCLUDES = [
 ]
 
 export const defaultSettings: Settings = {
-   preText: `Make sure to follow these guidelines for new code:
+   preText: `------------------ 🛠️ Guidelines ------------------ 
+
+Make sure to follow these guidelines for new code:
 
 1. Always provide the complete code for any changes you've made—whether it's a single-line tweak or a full file update.
 
-2. Clearly mention the exact file path of every file you’ve worked on. This helps me quickly locate the files and copy your code into my project without any confusion or extra effort.
+2. Clearly mention the exact complete file path of every file you’ve worked on. This helps me quickly locate the files and copy your code into my project without any confusion or extra effort.
 
 3. Maintain the same code style and structure as the rest of the project. Consistency is important for readability and maintainability.
 
-4. Follow the DRY (Don’t Repeat Yourself) principle—reuse code where & when possible to reduce redundancy and simplify maintenance.
+4. Follow the DRY (Don’t Repeat Yourself) and Modular Single Responsibility principl - only when it's appropriate and adds value—to minimize redundancy and make future maintenance and readability easier.
 
 5. Ensure code is free of syntax errors, logical errors. 
 
 6. Strive for maintainable and scalable solutions that can adapt to future changes and growth.
 
-7. If performance matters ensure Code Is Optimized for Performance When Relevant use of memoization, caching, indexing, lazy evaluation and parallelism (e.g., Promise.all() in JS) to improve performance only when necessary and justified.
+7. If performance matters ensure Code Is Optimized for Performance When Relevant use of memoization, caching, database indexing, pagination, lazy evaluation and parallelism (e.g., Promise.all() in JS) to improve performance only when necessary and possible.
 
 8. When dealing with large datasets especially during looping operations or doing Complex CRUD actions on multiple large records, please use batching to reduce overhead and improve performance. 
 

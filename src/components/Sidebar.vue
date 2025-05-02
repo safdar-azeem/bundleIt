@@ -51,7 +51,7 @@ function toggleSort() {
 
 async function handleClearHistory() {
    const isConfirmed = await confirm('Are you sure you want to clear all history?')
-   console.log('isConfirmed', isConfirmed)
+
    if (isConfirmed) {
       clearHistory()
       emit('clear-history')

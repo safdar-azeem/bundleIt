@@ -22,8 +22,8 @@ Simplify sharing large projects with AI tools like Claude, Deepseek or ChatGPT. 
 
 Download the latest version for your platform:
 
--  [macOS (.dmg)](https://github.com/safdar-azeem/bundleIt/releases/tag/v0.1.4)
--  [Windows (.exe)](https://github.com/safdar-azeem/bundleIt/releases/tag/v0.1.4)
+-  [macOS (.dmg)](https://github.com/safdar-azeem/bundleIt/releases/tag/v0.1.5)
+-  [Windows (.exe)](https://github.com/safdar-azeem/bundleIt/releases/tag/v0.1.5)
 
 ### Build from Source
 

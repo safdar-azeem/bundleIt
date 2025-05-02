@@ -20,18 +20,20 @@ export function useBundleOperations(
       error.value = null
 
       try {
-         let bundleContent = `Listing the contents of the "${folderName}" folder:\n`
+         let bundleContent = ``
 
          // Add global pre-text
          if (settings.value.preText) {
-            bundleContent += '\n' + settings.value.preText + '\n\n' + '='.repeat(55) + '\n'
+            bundleContent += '\n' + settings.value.preText + '\n\n'
          }
 
          // Add project pre-text
          const projectSettings = getProjectSettings(currentPath.value)
          if (projectSettings.preText) {
-            bundleContent += '\n' + projectSettings.preText + '\n\n' + '='.repeat(55) + '\n'
+            bundleContent += '\n' + projectSettings.preText + '\n\n'
          }
+
+         bundleContent += `-------- 📄 Listing the contents of the "${folderName}" folder: -------- \n\n`
 
          // Process each selected file
          for (const filePath of selectedPaths.value) {

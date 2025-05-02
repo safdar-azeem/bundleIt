@@ -1,4 +1,3 @@
-<!-- src/components/SelectedFilesPanel.vue -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
@@ -36,6 +35,7 @@ const emit = defineEmits<{
 }>()
 
 const searchQuery = ref('')
+const regexError = ref('')
 
 // Group files by directory
 const groupedFiles = computed(() => {
@@ -71,22 +71,44 @@ const groupedFiles = computed(() => {
 const filteredGroups = computed(() => {
    if (!searchQuery.value) return groupedFiles.value
 
-   const query = searchQuery.value.toLowerCase()
+   const query = searchQuery.value
 
+   // Try regex matching first
+   let regexResults: GroupedFile[] = []
+   let isValidRegex = false
+   try {
+      const regex = new RegExp(query, 'i') // Case-insensitive regex
+      regexResults = groupedFiles.value
+         .map((group) => {
+            const filteredFiles = group.files.filter((file) => regex.test(file.path))
+            if (filteredFiles.length > 0) {
+               return { ...group, files: filteredFiles }
+            }
+            return null
+         })
+         .filter(Boolean) as GroupedFile[]
+      isValidRegex = true
+      regexError.value = ''
+   } catch (error) {
+      regexError.value = 'Invalid regex pattern'
+   }
+
+   // If regex is valid and produced results, return them
+   if (isValidRegex && regexResults.length > 0) {
+      return regexResults
+   }
+
+   // Fallback to substring matching
+   const lowercaseQuery = query.toLowerCase()
    return groupedFiles.value
       .map((group) => {
-         // Filter files in this group
          const filteredFiles = group.files.filter(
             (file) =>
-               file.name.toLowerCase().includes(query) || file.path.toLowerCase().includes(query)
+               file.name.toLowerCase().includes(lowercaseQuery) ||
+               file.path.toLowerCase().includes(lowercaseQuery)
          )
-
-         // Only return groups that have matching files
          if (filteredFiles.length > 0) {
-            return {
-               ...group,
-               files: filteredFiles,
-            }
+            return { ...group, files: filteredFiles }
          }
          return null
       })
@@ -123,7 +145,7 @@ function closePanel() {
 <template>
    <div
       v-if="show"
-      class="selected-files-panel bg-white border-l border-gray-200 w-[17rem] xl:w-[26%] flex flex-col h-full overflow-hidden">
+      class="selected-files-panel bg-white border-l border-gray-200 w-[16rem] lg:w-[17.3rem] xl:w-[26%] flex flex-col h-full overflow-hidden">
       <!-- Header -->
       <div class="border-b border-gray-200 p-3 flex items-center justify-between bg-gray-50">
          <div class="font-medium flex items-center gap-2">
@@ -154,7 +176,8 @@ function closePanel() {
             icon="lucide:search"
             type="text"
             size="sm"
-            placeholder="Search selected files..." />
+            placeholder="Search selected files"
+            :error="regexError" />
       </div>
 
       <!-- File list -->
@@ -167,7 +190,7 @@ function closePanel() {
             No matching files found
          </div>
 
-         <div v-else class="divide-y divide-gray-150">
+         <div v-else class="divide-y divide-gray-200">
             <div v-for="group in filteredGroups" :key="group.directory" class="py-2">
                <!-- Directory name -->
                <div class="px-3 -text-fs-1 font-medium text-gray-500">
@@ -192,7 +215,7 @@ function closePanel() {
 
                      <button
                         @click="removeFile(file.path)"
-                        class="p-1 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500"
+                        class="p-1 opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 hover:text-red-500"
                         title="Remove from selection">
                         <Icon icon="lucide:x" class="w-4 h-4" />
                      </button>

@@ -191,44 +191,44 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
          <!-- Main Content + Selected Files Panel -->
          <div class="flex-1 flex overflow-hidden">
             <!-- File Tree -->
-            <div class="flex-1 overflow-y-auto web-scrollbar bg-body select-none">
-               <div class="max-w-screen-xl mx-auto px-6 py-4">
+            <div class="flex-1 bg-body select-none">
+               <div
+                  v-if="isLoadingFolder"
+                  class="text-center flex justify-center items-center mt-10 text-fs-5">
+                  <Icon icon="svg-spinners:180-ring" class="animate-spin" />
+               </div>
+               <div v-else-if="items.length">
                   <div
-                     v-if="isLoadingFolder"
-                     class="text-center flex justify-center items-center mt-10 text-fs-5">
-                     <Icon icon="svg-spinners:180-ring" class="animate-spin" />
+                     class="flex justify-between max-w-screen-xl mx-auto pl-6 pr-4 pt-4 w-full pb-3 gap-2 items-center">
+                     <SearchFilesFilter
+                        :items="items"
+                        class="flex-1"
+                        @update:isSearching="isSearching = $event"
+                        @update:filteredItems="filteredItems = $event" />
+                     <Button
+                        v-if="hasSelectedItems"
+                        variant="secondary"
+                        icon="lucide:list-checks"
+                        :active="showSelectedFilesPanel"
+                        :disabled="isProcessing"
+                        @click="toggleSelectedFilesPanel">
+                        {{ selectedPaths.size }} file{{ selectedPaths.size === 1 ? '' : 's' }}
+                     </Button>
                   </div>
-                  <div v-else-if="items.length">
-                     <div class="flex justify-between w-full pb-3 gap-2 items-center">
-                        <SearchFilesFilter
-                           :items="items"
-                           class="flex-1"
-                           @update:isSearching="isSearching = $event"
-                           @update:filteredItems="filteredItems = $event" />
-                        <Button
-                           v-if="hasSelectedItems"
-                           variant="secondary"
-                           icon="lucide:list-checks"
-                           :active="showSelectedFilesPanel"
-                           :disabled="isProcessing"
-                           @click="toggleSelectedFilesPanel">
-                           {{ selectedPaths.size }} file{{ selectedPaths.size === 1 ? '' : 's' }}
-                        </Button>
-                     </div>
+                  <div
+                     class="overflow-y-auto max-w-screen-xl mx-auto px-6 pb-10 web-scrollbar max-h-[calc(100vh-130px)]">
                      <FileTreeView
                         :items="filteredItems"
                         v-model:selected-paths="selectedPaths"
                         :isSearching="isSearching" />
                   </div>
-                  <div v-else class="text-center py-12">
-                     <div class="rounded-lg border-2 border-dashed p-12">
-                        <div class="text-gray-500">
-                           {{
-                              currentPath
-                                 ? 'This folder is empty'
-                                 : 'Choose a folder to get started'
-                           }}
-                        </div>
+               </div>
+               <div v-else class="text-center py-12 max-w-screen-xl mx-auto px-6">
+                  <div class="rounded-lg border-2 border-dashed p-12">
+                     <div class="text-gray-500">
+                        {{
+                           currentPath ? 'This folder is empty' : 'Choose a folder to get started'
+                        }}
                      </div>
                   </div>
                </div>

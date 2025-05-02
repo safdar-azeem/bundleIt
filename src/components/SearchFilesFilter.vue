@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import Input from './Input.vue'
 import { FileNode } from '../types'
+import { Icon } from '@iconify/vue'
 
 const props = defineProps<{
    items: FileNode[]
@@ -13,23 +14,55 @@ const emit = defineEmits<{
 }>()
 
 const searchQuery = ref('')
+const regexError = ref('')
 
 function filterNodes(nodes: FileNode[], query: string): FileNode[] {
-   const lowercaseQuery = query.toLowerCase()
+   if (!query) return nodes
 
+   // Try regex matching first
+   let regexResults: FileNode[] = []
+   let isValidRegex = false
+   try {
+      const regex = new RegExp(query, 'i') // Case-insensitive regex
+      regexResults = nodes.reduce((filtered: FileNode[], node) => {
+         const matches = regex.test(node.path)
+         let nodeToAdd: FileNode | null = null
+
+         if (node.isDirectory) {
+            const filteredChildren = node.children ? filterNodes(node.children, query) : []
+            if (matches || filteredChildren.length > 0) {
+               nodeToAdd = { ...node, children: filteredChildren }
+            }
+         } else if (matches) {
+            nodeToAdd = { ...node }
+         }
+
+         if (nodeToAdd) {
+            filtered.push(nodeToAdd)
+         }
+         return filtered
+      }, [])
+      isValidRegex = true
+      regexError.value = ''
+   } catch (error) {
+      regexError.value = 'Invalid regex pattern'
+   }
+
+   // If regex is valid and produced results, return them
+   if (isValidRegex && regexResults.length > 0) {
+      return regexResults
+   }
+
+   // Fallback to substring matching on node.name
+   const lowercaseQuery = query.toLowerCase()
    return nodes.reduce((filtered: FileNode[], node) => {
-      // Check if current node matches
       const matches = node.name.toLowerCase().includes(lowercaseQuery)
       let nodeToAdd: FileNode | null = null
 
       if (node.isDirectory) {
          const filteredChildren = node.children ? filterNodes(node.children, query) : []
-
          if (matches || filteredChildren.length > 0) {
-            nodeToAdd = {
-               ...node,
-               children: filteredChildren,
-            }
+            nodeToAdd = { ...node, children: filteredChildren }
          }
       } else if (matches) {
          nodeToAdd = { ...node }
@@ -42,16 +75,16 @@ function filterNodes(nodes: FileNode[], query: string): FileNode[] {
    }, [])
 }
 
-watch(
-   [searchQuery, () => props.items],
-   ([newQuery]) => {
-      const filtered = newQuery ? filterNodes(props.items, newQuery) : props.items
+function updateFilters() {
+   const filtered = searchQuery.value ? filterNodes(props.items, searchQuery.value) : props.items
+   emit('update:filteredItems', filtered)
+   emit('update:isSearching', !!searchQuery.value)
+}
 
-      emit('update:filteredItems', filtered)
-      emit('update:isSearching', !!newQuery)
-   },
-   { immediate: true, deep: true }
-)
+watch([searchQuery, () => props.items], () => updateFilters(), {
+   immediate: true,
+   deep: true,
+})
 </script>
 
 <template>

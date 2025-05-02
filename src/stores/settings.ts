@@ -52,8 +52,8 @@ const DEFAULT_EXCLUDES = [
    '_locales',
 ]
 
-const defaultSettings: Settings = {
-   preText: `please make sure to follow these guidelines:
+export const defaultSettings: Settings = {
+   preText: `Make sure to follow these guidelines for new code:
 
 1. Always provide the complete code for any changes you've made—whether it's a single-line tweak or a full file update.
 
@@ -61,7 +61,17 @@ const defaultSettings: Settings = {
 
 3. Maintain the same code style and structure as the rest of the project. Consistency is important for readability and maintainability.
 
-4. Follow the DRY (Don’t Repeat Yourself) principle—reuse code where possible to reduce redundancy and simplify maintenance.
+4. Follow the DRY (Don’t Repeat Yourself) principle—reuse code where & when possible to reduce redundancy and simplify maintenance.
+
+5. Ensure code is free of syntax errors, logical errors. 
+
+6. Strive for maintainable and scalable solutions that can adapt to future changes and growth.
+
+7. If performance matters ensure Code Is Optimized for Performance When Relevant use of memoization, caching, indexing, lazy evaluation and parallelism (e.g., Promise.all() in JS) to improve performance only when necessary and justified.
+
+8. When dealing with large datasets especially during looping operations or doing Complex CRUD actions on multiple large records, please use batching to reduce overhead and improve performance. 
+
+9. Ensure every API call includes proper error handling try/catch blocks or similar techniques.
 `,
    afterText: '',
    excludes: DEFAULT_EXCLUDES,
@@ -102,8 +112,9 @@ export const useSettings = () => {
       settings.value.excludes = settings.value.excludes.filter((p) => p !== pattern)
    }
 
-   const resetExcludes = () => {
+   const resetAll = () => {
       settings.value.excludes = [...DEFAULT_EXCLUDES]
+      localStorage.removeItem('bundleit-version')
    }
 
    const updateProjectSettings = (
@@ -139,9 +150,10 @@ export const useSettings = () => {
       settings,
       addExclude,
       removeExclude,
-      resetExcludes,
+      resetAll,
       DEFAULT_EXCLUDES,
       updateProjectSettings,
       getProjectSettings,
+      defaultSettings,
    }
 }

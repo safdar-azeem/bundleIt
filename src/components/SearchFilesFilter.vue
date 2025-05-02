@@ -25,7 +25,7 @@ function filterNodes(nodes: FileNode[], query: string): FileNode[] {
    try {
       const regex = new RegExp(query, 'i') // Case-insensitive regex
       regexResults = nodes.reduce((filtered: FileNode[], node) => {
-         const matches = regex.test(node.path)
+         const matches = regex.test(node.name)
          let nodeToAdd: FileNode | null = null
 
          if (node.isDirectory) {

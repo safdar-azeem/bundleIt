@@ -77,10 +77,10 @@ const filteredGroups = computed(() => {
    let regexResults: GroupedFile[] = []
    let isValidRegex = false
    try {
-      const regex = new RegExp(query, 'i') // Case-insensitive regex
+      const regex = new RegExp(query, 'i')
       regexResults = groupedFiles.value
          .map((group) => {
-            const filteredFiles = group.files.filter((file) => regex.test(file.path))
+            const filteredFiles = group.files.filter((file) => regex.test(file.name))
             if (filteredFiles.length > 0) {
                return { ...group, files: filteredFiles }
             }
@@ -181,7 +181,7 @@ function closePanel() {
       </div>
 
       <!-- File list -->
-      <div class="flex-1 overflow-y-auto web-scrollbar -text-fs-1">
+      <div class="flex-1 overflow-y-auto overflow-x-hidden web-scrollbar -text-fs-1">
          <div v-if="totalSelectedFiles === 0" class="p-4 text-center text-gray-500">
             No files selected
          </div>
@@ -193,7 +193,7 @@ function closePanel() {
          <div v-else class="divide-y divide-gray-200">
             <div v-for="group in filteredGroups" :key="group.directory" class="py-2">
                <!-- Directory name -->
-               <div class="px-3 -text-fs-1 font-medium text-gray-500">
+               <div class="px-3 -text-fs-1 font-medium text-gray-500 truncate">
                   {{ group.directory?.split(folderName)?.[1] || 'Root' }}
                </div>
 

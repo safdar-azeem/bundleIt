@@ -17,7 +17,7 @@ const {
    settings,
    addExclude,
    removeExclude,
-   resetExcludes,
+   resetAll,
    DEFAULT_EXCLUDES,
    updateProjectSettings,
    getProjectSettings,
@@ -189,7 +189,7 @@ const close = () => {
                            variant="outline"
                            text="Reset to Defaults"
                            size="sm"
-                           @click="resetExcludes" />
+                           @click="resetAll" />
                         <p class="mt-2 text-sm text-gray-500">
                            This will restore the default set of commonly excluded files and folders
                         </p>

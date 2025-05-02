@@ -33,8 +33,8 @@ async function openExternalLink(url) {
       @click="close">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-[450px] p-6" @click.stop>
          <!-- Header with wave emoji -->
-         <div class="text-center mb-6">
-            <div class="text-4xl mb-2">👋</div>
+         <div class="text-center mb-3">
+            <div class="text-5xl mb-2">👋</div>
             <h2 class="text-2xl font-bold text-gray-850">Welcome to BundleIt!</h2>
          </div>
 

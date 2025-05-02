@@ -163,8 +163,6 @@ export function useDirectoryOperations(
       try {
          const entries = await readDir(dirPath)
 
-         console.log('entries :>> ', entries)
-
          const processedEntries = await processEntriesParallel(
             entries,
             dirPath,

@@ -42,7 +42,6 @@ export function useBundleOperations(
                const normalizedPath = relativePath.replace(/^[/\\]+/, '')
 
                const content = await readTextFile(filePath)
-               console.log('content :>> ', content)
 
                // Skip empty files instead of returning
                if (!content.trim()) {
@@ -54,7 +53,6 @@ export function useBundleOperations(
                bundleContent += `File Path: ${normalizedPath}\n\n`
                bundleContent += content
             } catch (err) {
-               console.log('err :>> ', err)
                bundleContent += ``
             }
          }

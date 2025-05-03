@@ -4,6 +4,7 @@ import { ref, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import ThemeToggle from './ThemeToggle.vue'
 import { useHistory } from '../stores/history'
+import { exit, relaunch } from '@tauri-apps/plugin-process'
 
 const props = defineProps<{
    currentPath: string | null
@@ -34,8 +35,8 @@ const sortedHistory = computed(() => {
 async function handleRefresh() {
    try {
       isRefreshing.value = true
-      props?.clearCache() // Clear all cache
-      await props?.refreshCurrentFolder() // Reload current folder
+      props?.clearCache()
+      await relaunch()
    } finally {
       isRefreshing.value = false
    }

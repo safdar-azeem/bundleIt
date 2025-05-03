@@ -41,6 +41,9 @@
     "core:window:default",
     "core:window:allow-start-dragging",
     "shell:allow-execute",
-    "shell:default"
+    "shell:default",
+    "process:default",
+    "process:allow-exit",
+    "process:allow-restart"
   ]
 }

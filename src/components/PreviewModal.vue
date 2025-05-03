@@ -13,7 +13,8 @@ const emit = defineEmits<{
    save: []
 }>()
 
-const overviewContent = ref(`------------------ 🎯 Task Overview ------------------\n\n`)
+const defaultOverviewContent = `------------------ 🎯 Task Overview ------------------\n\n`
+const overviewContent = ref(defaultOverviewContent)
 
 const isCopyied = ref(false)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -32,6 +33,7 @@ const copyToClipboard = async () => {
 
 const close = () => {
    emit('update:show', false)
+   overviewContent.value = defaultOverviewContent
 }
 
 onMounted(() => {
@@ -51,7 +53,7 @@ watch([props.show, props.content, textareaRef], () => {
       class="fixed inset-0 w-full bg-[#00000077] flex items-center justify-center z-50"
       @click="close">
       <div
-         class="bg-white rounded-lg shadow-xl w-full max-w-[67%] h-[80%] flex flex-col"
+         class="bg-white rounded-lg shadow-xl w-full max-w-[68%] h-[93%] flex flex-col"
          @click.stop>
          <!-- Header -->
          <div class="flex justify-between items-center border-b px-6 py-3">
@@ -71,19 +73,21 @@ watch([props.show, props.content, textareaRef], () => {
          </div>
 
          <!-- Content -->
-         <div class="flex-1 overflow-hidden flex flex-col p-6">
+         <div class="flex-1 overflow-hidden flex flex-col p-6 -text-fs-1">
             <textarea
                ref="textareaRef"
                :autocomplete="'off'"
                :spellcheck="false"
+               autoResize
                :autocorrect="'off'"
                :value="overviewContent"
+               :rows="9"
                @input="overviewContent = ($event.target as any)?.value"
-               :class="`w-full h-[164px] font-mono text-sm p-4 border-x border-t rounded-t resize-none web-scrollbar bg-gray-50`" />
+               :class="`w-full font-mono text-sm px-4 pt-3 border-x border-t rounded-t  web-scrollbar bg-gray-50`" />
 
             <textarea
                :value="props?.content"
-               class="w-full flex-1 font-mono text-sm p-4 border-x rounded-none border-b rounded-b -mt-2 resize-none focus:border-primary focus:ring-1 focus:ring-primary web-scrollbar bg-gray-50"
+               class="w-full flex-1 font-mono text-sm px-4 border-x rounded-none border-b -text-fs-1 rounded-b resize-none focus:border-primary focus:ring-1 focus:ring-primary web-scrollbar bg-gray-50"
                disabled />
          </div>
       </div>

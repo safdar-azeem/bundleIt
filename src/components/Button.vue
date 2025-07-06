@@ -3,7 +3,14 @@ import { computed } from 'vue'
 import type { PropType } from 'vue'
 import { Icon } from '@iconify/vue'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'outline-primary'
+export type ButtonVariant =
+   | 'primary'
+   | 'secondary'
+   | 'danger'
+   | 'outline'
+   | 'outline-primary'
+   | 'transparent'
+
 export type ButtonSize = 'sm' | 'md' | 'lg'
 
 const props = defineProps({
@@ -39,6 +46,13 @@ const props = defineProps({
       type: Object,
       default: null,
    },
+   active: {
+      type: Boolean,
+      default: false,
+   },
+   iconSize: {
+      type: String,
+   },
 })
 
 const emit = defineEmits(['click'])
@@ -46,7 +60,9 @@ const emit = defineEmits(['click'])
 const classes = computed(() => {
    const variants = {
       primary: 'bg-primary text-primary-fg hover:bg-primary-dark',
-      secondary: 'bg-gray-200 text-gray-850 hover:bg-gray-300',
+      secondary: props.active
+         ? 'bg-primary text-primary-fg'
+         : 'bg-gray-200 text-gray-850 hover:bg-gray-300',
       danger: 'bg-danger text-danger-fg hover:bg-danger-dark',
       outline: 'border border-gray-400 text-gray-700 hover:bg-gray-50',
       'outline-primary': 'border-2 border-primary text-primary hover:bg-primary-light',
@@ -60,7 +76,7 @@ const classes = computed(() => {
 
    const iconSizes = {
       sm: 'p-1.5',
-      md: 'p-3',
+      md: 'p-2.5',
       lg: 'p-2.5',
    }
 
@@ -68,7 +84,7 @@ const classes = computed(() => {
       'inline-flex gap-2.5 items-center justify-center rounded-md font-medium transition-colors',
       'disabled:opacity-50 disabled:cursor-not-allowed',
       variants[props.variant],
-      props.text ? sizes[props.size] : iconSizes[props.size],
+      props.text ? sizes[props.size] : iconSizes[props?.iconSize || props.size],
    ]
 })
 
@@ -77,8 +93,8 @@ const iconSize = computed(
       ({
          sm: 16,
          md: 18,
-         lg: 20,
-      }[props.size])
+         lg: 19,
+      }[props?.iconSize || props.size])
 )
 
 function handleClick(event: MouseEvent) {
@@ -90,10 +106,25 @@ function handleClick(event: MouseEvent) {
 
 <template>
    <button :type="type" :class="classes" :disabled="disabled || loading" @click="handleClick">
-      <Icon icon="svg-spinners:180-ring" v-if="loading" :size="iconSize" class="animate-spin" />
-      <Icon :icon="icon" v-else-if="icon && !iconRight" :size="iconSize" />
+      <Icon
+         icon="svg-spinners:180-ring"
+         v-if="loading"
+         :style="{
+            width: iconSize + 'px',
+            height: iconSize + 'px',
+         }"
+         class="animate-spin" />
+      <Icon
+         :icon="icon"
+         v-else-if="icon && !iconRight"
+         :style="{
+            width: iconSize + 'px',
+            height: iconSize + 'px',
+         }" />
 
-      <span v-if="text">{{ text }}</span>
+      <span v-if="text"
+         ><slot>{{ text }}</slot></span
+      >
 
       <component :is="iconRight" v-if="iconRight && !loading" :size="iconSize" />
    </button>

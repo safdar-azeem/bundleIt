@@ -6,6 +6,7 @@ const props = defineProps<{
    show: boolean
    content: string
    fileName?: string
+   currentPath: string
 }>()
 
 const emit = defineEmits<{
@@ -33,7 +34,6 @@ const copyToClipboard = async () => {
 
 const close = () => {
    emit('update:show', false)
-   overviewContent.value = defaultOverviewContent
 }
 
 onMounted(() => {
@@ -41,6 +41,14 @@ onMounted(() => {
       textareaRef.value?.focus()
    }, 100)
 })
+
+watch(
+   () => props.currentPath,
+   (newValue) => {
+      overviewContent.value = defaultOverviewContent
+   },
+   { immediate: true }
+)
 
 watch([props.show, props.content, textareaRef], () => {
    textareaRef.value?.focus()

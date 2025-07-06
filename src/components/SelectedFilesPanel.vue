@@ -1,17 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import CheckBox from './CheckBox.vue'
 import Input from './Input.vue'
-import Button from './Button.vue'
-
-interface FileNode {
-   name: string
-   path: string
-   isDirectory: boolean
-   isFile: boolean
-   children?: FileNode[]
-}
 
 interface GroupedFile {
    directory: string

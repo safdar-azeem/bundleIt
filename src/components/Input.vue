@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { PropType } from 'vue'
 import { Icon } from '@iconify/vue'
 
 export type InputVariant = 'solid' | 'outline'
 export type InputSize = 'sm' | 'md' | 'lg'
-export type InputType = 'text' | 'textarea' | 'password' | 'email' | 'number'
+export type InputType = 'text' | 'textarea' | 'password' | 'email' | 'number' | 'date'
 
 const props = defineProps({
    modelValue: {
@@ -55,6 +55,18 @@ const props = defineProps({
    rounded: {
       type: String as PropType<'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>,
       default: 'md',
+   },
+   showClearButton: {
+      type: Boolean,
+      default: true,
+   },
+   inputClass: {
+      type: String,
+      default: '',
+   },
+   autofocus: {
+      type: Boolean,
+      default: false,
    },
 })
 
@@ -116,6 +128,7 @@ const inputClasses = computed(() => {
       paddingRight[props.size],
       rounded[props.rounded],
       props.error ? 'border-danger' : '',
+      props.inputClass,
    ]
 })
 
@@ -170,6 +183,12 @@ function clearInput() {
       input.value.focus()
    }
 }
+
+onMounted(() => {
+   if (props.autofocus) {
+      input.value?.focus()
+   }
+})
 </script>
 
 <template>
@@ -178,7 +197,7 @@ function clearInput() {
          {{ label }}
       </label>
 
-      <div class="relative">
+      <div class="relative h-full">
          <textarea
             v-if="type === 'textarea'"
             ref="input"
@@ -220,7 +239,7 @@ function clearInput() {
 
          <!-- Clear button (cross icon) -->
          <Icon
-            v-if="!disabled && !loading && hasValue"
+            v-if="showClearButton && !disabled && !loading && hasValue"
             icon="mdi:close-circle"
             :size="iconSize"
             :class="clearButtonClasses"

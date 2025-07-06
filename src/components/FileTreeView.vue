@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { Icon } from '@iconify/vue'
+import { computed, ref, watch } from 'vue'
 import CheckBox from './CheckBox.vue'
 import { useSettings } from '../stores/settings'
 
@@ -28,17 +28,92 @@ const { settings } = useSettings()
 const expandedNodes = ref(new Set<string>())
 const loadedPaths = ref(new Set<string>())
 
-// Sort function to put folders first, then files
+const sortedItems = computed(() => sortItems(props.items))
+
+const isNodeSelected = (node: FileNode): boolean => {
+   if (props.selectedPaths.has(node.path)) return true
+   if (node.isDirectory && node.children) {
+      return node.children.length > 0 && node.children.every((child) => isNodeSelected(child))
+   }
+   return false
+}
+
+const isNodePartiallySelected = (node: FileNode): boolean => {
+   if (!node.isDirectory || props.selectedPaths.has(node.path)) return false
+   if (node.children && node.children.length > 0) {
+      const selectedChildrenCount = node.children.reduce((count, child) => {
+         if (isNodeSelected(child)) return count + 1
+         if (isNodePartiallySelected(child)) return count + 0.5
+         return count
+      }, 0)
+      return selectedChildrenCount > 0 && selectedChildrenCount < node.children.length
+   }
+   return false
+}
+
+const shouldShowChildren = (item: FileNode): boolean => {
+   if (!item.isDirectory) return false
+   return expandedNodes.value.has(item.path) && Boolean(item.children?.length)
+}
+
+const shouldShowItem = (item: FileNode) => {
+   const includeDotDir = ['.github', '.env']
+   if (
+      !settings.value.showHiddenFiles &&
+      item.name.startsWith('.') &&
+      !includeDotDir.includes(item.name)
+   )
+      return false
+
+   if (!settings.value.excludes.includes(item.name)) {
+      if (props.isSearching && item.isDirectory && (!item.children || item.children.length === 0)) {
+         return false
+      }
+      return true
+   }
+
+   return false
+}
+
 const sortItems = (items: FileNode[]): FileNode[] => {
    return [...items].sort((a, b) => {
-      if (a.isDirectory === b.isDirectory) {
-         return a.name.localeCompare(b.name)
-      }
+      if (a.isDirectory === b.isDirectory) return a.name.localeCompare(b.name)
       return a.isDirectory ? -1 : 1
    })
 }
 
-const sortedItems = computed(() => sortItems(props.items))
+const getAllPossibleFilePaths = (node: FileNode): string[] => {
+   const paths: string[] = []
+   const parts = node.path.split(/[/\\]/)
+   for (let i = 1; i <= parts.length; i++) {
+      paths.push(parts.slice(0, i).join('/'))
+   }
+   return paths
+}
+
+const getAllFilePaths = (node: FileNode): string[] => {
+   if (node.isFile && shouldShowItem(node)) return [node.path]
+
+   if (node.isDirectory) {
+      const allPaths = [node.path]
+
+      if (!loadedPaths.value.has(node.path)) {
+         const possiblePaths = getAllPossibleFilePaths(node)
+         if (possiblePaths.some((path) => props.selectedPaths.has(path))) {
+            return possiblePaths
+         }
+      }
+
+      if (node.children) {
+         const childPaths = node.children.flatMap((child) => getAllFilePaths(child)).filter(Boolean)
+         allPaths.push(...childPaths)
+      }
+
+      return allPaths
+   }
+
+   return []
+}
 
 const updateParentSelections = (path: string, isSelected: boolean) => {
    const pathParts = path.split(/[/\\]/)
@@ -52,108 +127,20 @@ const updateParentSelections = (path: string, isSelected: boolean) => {
          const hasSelectedChildren = Array.from(newSelection).some(
             (selectedPath) => selectedPath.startsWith(parentPath + '/') && selectedPath !== path
          )
-         if (!hasSelectedChildren) {
-            newSelection.delete(parentPath)
-         }
+         if (!hasSelectedChildren) newSelection.delete(parentPath)
       }
    }
 
    emit('update:selectedPaths', newSelection)
 }
 
-const getAllFilePaths = (node: FileNode): string[] => {
-   if (node.isFile && shouldShowItem(node)) {
-      return [node.path]
-   }
-   if (node.isDirectory) {
-      const allPaths = [node.path]
-
-      if (!loadedPaths.value.has(node.path)) {
-         const possiblePaths = getAllPossibleFilePaths(node)
-         if (possiblePaths.some((path) => props.selectedPaths.has(path))) {
-            return possiblePaths
-         }
-      }
-
-      if (node.children) {
-         const childPaths = node.children
-            .flatMap((child) => getAllFilePaths(child))
-            .filter((path) => path)
-         allPaths.push(...childPaths)
-      }
-
-      return allPaths
-   }
-   return []
-}
-
-const shouldShowItem = (item: FileNode) => {
-   const includeDotDir = ['.github', '.env']
-   if (
-      !settings.value.showHiddenFiles &&
-      item.name.startsWith('.') &&
-      !includeDotDir.includes(item.name)
-   ) {
-      return false
-   }
-   return !settings.value.excludes.includes(item.name)
-}
-
-const getAllPossibleFilePaths = (node: FileNode): string[] => {
-   const paths: string[] = []
-   const parts = node.path.split(/[/\\]/)
-
-   for (let i = 1; i <= parts.length; i++) {
-      paths.push(parts.slice(0, i).join('/'))
-   }
-
-   return paths
-}
-
 const toggleNode = async (node: FileNode) => {
-   if (node.isDirectory) {
-      if (expandedNodes.value.has(node.path)) {
-         expandedNodes.value.delete(node.path)
-      } else {
-         expandedNodes.value.add(node.path)
-         loadedPaths.value.add(node.path)
-      }
-   }
-}
-
-const isNodeSelected = (node: FileNode): boolean => {
-   if (props.selectedPaths.has(node.path)) {
-      return true
-   }
-
-   if (node.isDirectory && node.children) {
-      return node.children.length > 0 && node.children.every((child) => isNodeSelected(child))
-   }
-
-   return false
-}
-
-const isNodePartiallySelected = (node: FileNode): boolean => {
-   if (!node.isDirectory) {
-      return false
-   }
-
-   if (props.selectedPaths.has(node.path)) {
-      return false
-   }
-
-   if (node.children && node.children.length > 0) {
-      const selectedChildrenCount = node.children.reduce((count, child) => {
-         if (isNodeSelected(child)) {
-            return count + 1
-         }
-         if (isNodePartiallySelected(child)) {
-            return count + 0.5
-         }
-         return count
-      }, 0)
-
-      return selectedChildrenCount > 0 && selectedChildrenCount < node.children.length
+   if (!node.isDirectory) return
+   if (expandedNodes.value.has(node.path)) {
+      expandedNodes.value.delete(node.path)
+   } else {
+      expandedNodes.value.add(node.path)
+      loadedPaths.value.add(node.path)
    }
 }
 
@@ -162,14 +149,11 @@ const toggleSelection = async (node: FileNode) => {
    const isCurrentlySelected = isNodeSelected(node)
 
    const processNode = async (currentNode: FileNode, selected: boolean) => {
-      if (currentNode.isDirectory) {
-         if (currentNode.children) {
-            for (const child of currentNode.children) {
-               await processNode(child, selected)
-            }
+      if (currentNode.isDirectory && currentNode.children) {
+         for (const child of currentNode.children) {
+            await processNode(child, selected)
          }
       }
-
       if (selected) {
          newSelection.add(currentNode.path)
       } else {
@@ -181,6 +165,29 @@ const toggleSelection = async (node: FileNode) => {
    updateParentSelections(node.path, !isCurrentlySelected)
    emit('update:selectedPaths', newSelection)
 }
+
+const autoExpandSearchMatches = (items: FileNode[]) => {
+   if (!props.isSearching) return
+   items.forEach((item) => {
+      if (item.isDirectory && item.children?.length) {
+         expandedNodes.value.add(item.path)
+         autoExpandSearchMatches(item.children)
+      }
+   })
+}
+
+watch(
+   () => [props.isSearching, props.items],
+   () => {
+      if (props.isSearching) {
+         autoExpandSearchMatches(props.items)
+      } else {
+         expandedNodes.value.clear()
+         loadedPaths.value.clear()
+      }
+   },
+   { immediate: true }
+)
 </script>
 
 <template>
@@ -197,7 +204,6 @@ const toggleSelection = async (node: FileNode) => {
                      class="p-1 rounded hover:bg-gray-200 mr-1"
                      @click.stop="toggleNode(item)">
                      <Icon
-                        v-if="!isSearching"
                         :icon="
                            expandedNodes.has(item.path)
                               ? 'lucide:chevron-down'
@@ -223,12 +229,8 @@ const toggleSelection = async (node: FileNode) => {
                   <span class="text-sm text-gray-850">{{ item.name }}</span>
                </div>
                <div
-                  v-if="item.isDirectory"
-                  class="ml-6 mb-1 mt-1 children-container"
-                  :class="{
-                     hidden: !expandedNodes.has(item.path),
-                     block: isSearching || expandedNodes.has(item.path),
-                  }">
+                  v-if="item.isDirectory && shouldShowChildren(item)"
+                  class="ml-6 mb-1 mt-1 children-container">
                   <FileTreeView
                      v-if="item.children"
                      :items="sortItems(item.children)"
@@ -256,13 +258,5 @@ const toggleSelection = async (node: FileNode) => {
 .children-container {
    transition: height 0.2s ease-in-out;
    overflow: hidden;
-}
-
-.children-container.hidden {
-   display: none;
-}
-
-.children-container.block {
-   display: block;
 }
 </style>

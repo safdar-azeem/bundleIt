@@ -13,22 +13,14 @@ const emit = defineEmits<{
    'update:show': [value: boolean]
 }>()
 
-const {
-   settings,
-   addExclude,
-   removeExclude,
-   resetAll,
-   DEFAULT_EXCLUDES,
-   updateProjectSettings,
-   getProjectSettings,
-} = useSettings()
+const { settings, addExclude, removeExclude, resetAll, updateProjectSettings, getProjectSettings } =
+   useSettings()
 
 const newExclude = ref('')
 const projectSettings = ref(
    props.currentPath ? getProjectSettings(props.currentPath) : { preText: '', afterText: '' }
 )
 
-// Watch for changes in currentPath
 watch(
    () => props.currentPath,
    (newPath) => {
@@ -39,7 +31,6 @@ watch(
    { immediate: true }
 )
 
-// Watch for changes in projectSettings and save them
 watch(
    projectSettings,
    (newSettings) => {

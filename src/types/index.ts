@@ -21,3 +21,17 @@ export interface FileOperation {
    filePath: string
    success: boolean
 }
+
+export interface Task {
+   id: string
+   title: string
+   description: string
+   status: 'todo' | 'inProgress' | 'completed'
+   position: number
+   createdAt: number
+   updatedAt: number
+}
+
+export interface ProjectTasks {
+   [projectPath: string]: Task[]
+}

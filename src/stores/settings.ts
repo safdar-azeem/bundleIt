@@ -59,21 +59,25 @@ Make sure to follow these guidelines for new code:
 
 1. Always provide the complete code for any changes you've made—whether it's a single-line tweak or a full file update.
 
-2. Clearly mention the exact complete file path of every file you’ve worked on. This helps me quickly locate the files and copy your code into my project without any confusion or extra effort.
+2. Clearly before every code blocks/artifacts mention the exact full file path of every file you’ve worked on. This helps me quickly locate the files and copy your code into my project without any confusion or extra effort.
 
 3. Maintain the same code style and structure as the rest of the project. Consistency is important for readability and maintainability.
 
-4. Follow the DRY (Don’t Repeat Yourself) and Modular Single Responsibility principl - only when it's appropriate and adds value—to minimize redundancy and make future maintenance and readability easier.
+4. Follow the DRY (Don’t Repeat Yourself) and Modular Single Responsibility principl - adds value—to minimize redundancy and make future maintenance and readability easier.
 
-5. Ensure code is free of syntax errors, logical errors. 
+5. Ensure code has no syntax or logical errors. Add comments only when truly absolutely necessary, skip them if the code is self-explanatory. Aim for clean, maintainable, and scalable solutions.
 
-6. Strive for maintainable and scalable solutions that can adapt to future changes and growth.
+6. Ensure Code Is Optimized for Performance When Relevant use of memoization, caching, database indexing, pagination, lazy evaluation and parallelism (e.g., Promise.all()), parallelism only when necessary and applicable.
 
-7. If performance matters ensure Code Is Optimized for Performance When Relevant use of memoization, caching, database indexing, pagination, lazy evaluation and parallelism (e.g., Promise.all() in JS) to improve performance only when necessary and possible.
+7. For large datasets or complex CRUD operations, use batching to minimize overhead and boost performance.
 
-8. When dealing with large datasets especially during looping operations or doing Complex CRUD actions on multiple large records, please use batching to reduce overhead and improve performance. 
+8. Ensure every API call includes proper error handling try/catch blocks or similar techniques.
 
-9. Ensure every API call includes proper error handling try/catch blocks or similar techniques.
+9. Use semantic Elements, prioritize SEO and UX, and ensure accessibility on the frontend.
+
+10. In your response only codeblocks/artifacts no other Explanation or extra texts
+
+
 `,
    afterText: '',
    excludes: DEFAULT_EXCLUDES,

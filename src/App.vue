@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar.vue'
 import FileTreeView from './components/FileTreeView.vue'
 import WelcomeModal from './components/WelcomeModal.vue'
 import SettingsModal from './components/SettingsModal.vue'
+import TaskManagement from './components/TaskManagement.vue'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { useNotifications } from './composables/useNotifications'
 import ToastNotification from './components/ToastNotification.vue'
@@ -14,6 +15,7 @@ import { useFileOperations } from './composables/useFileOperations'
 import { computed, watch, ref, onMounted, defineAsyncComponent } from 'vue'
 
 const showSettings = ref(false)
+const showTasks = ref(false)
 const PreviewModal = defineAsyncComponent(() => import('./components/PreviewModal.vue'))
 
 const previewContent = ref('')
@@ -118,6 +120,8 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
    <div class="flex h-screen bg-body">
       <!-- Sidebar -->
       <Sidebar
+         :isProcessing="isProcessing"
+         :selectFolder="selectFolder"
          :clearCache="clearCache"
          :current-path="currentPath"
          :refreshCurrentFolder="refreshCurrentFolder"
@@ -134,25 +138,28 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
       <!-- Main Content -->
       <div class="flex-1 flex flex-col overflow-hidden">
          <!-- Header -->
-         <div class="bg-body border-b">
+         <div class="bg-body border-b" v-if="currentPath">
             <div class="max-w-screen-xl mx-auto px-6 py-4">
                <div class="flex items-center justify-between">
                   <div class="flex items-center justify-between w-full space-x-4">
                      <div class="flex items-center gap-3">
                         <Button
-                           variant="secondary"
-                           text="Choose Folder"
-                           icon="lucide:folder"
+                           v-if="currentPath"
+                           text="Tasks"
+                           icon="hugeicons:task-done-02"
+                           iconSize="lg"
                            :disabled="isProcessing"
-                           @click="() => selectFolder(null)" />
+                           @click="showTasks = true">
+                        </Button>
+
                         <Button
                            v-if="selectedPaths.size"
                            variant="secondary"
+                           class="-text-fs-2"
                            icon="lucide:x-circle"
                            :disabled="isProcessing"
                            @click="handleUnselectAll" />
 
-                        <!-- Error Message -->
                         <div v-if="error" class="flex items-center text-danger">
                            <Icon icon="lucide:circle-alert" class="w-4 h-4 mr-2" />
                            {{ error }}
@@ -170,16 +177,16 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex items-center gap-2" v-if="hasSelectedItems">
+                        <div class="flex items-center gap-2">
                            <Button
+                              :disabled="!hasSelectedItems || isProcessing"
                               variant="secondary"
                               icon="lucide:eye"
-                              :disabled="isProcessing"
                               @click="() => handlePreviewBundle()" />
                            <Button
                               variant="primary"
                               text="Create Bundle"
-                              :disabled="isProcessing"
+                              :disabled="!hasSelectedItems || isProcessing"
                               @click="handleSaveBundle" />
                         </div>
                      </div>
@@ -206,7 +213,6 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
                         @update:isSearching="isSearching = $event"
                         @update:filteredItems="filteredItems = $event" />
                      <Button
-                        v-if="hasSelectedItems"
                         variant="secondary"
                         icon="lucide:list-checks"
                         :active="showSelectedFilesPanel"
@@ -244,6 +250,12 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
          </div>
       </div>
 
+      <!-- Task Management Modal -->
+      <TaskManagement
+         v-model:show="showTasks"
+         :projectPath="currentPath"
+         :projectName="folderName" />
+
       <!-- Settings Modal -->
       <SettingsModal v-model:show="showSettings" :currentPath="currentPath" />
 
@@ -259,6 +271,7 @@ const hasSelectedItems = computed(() => selectedPaths.value.size > 0)
       <PreviewModal
          v-model:show="showPreview"
          :content="previewContent"
+         :currentPath="currentPath"
          @save="showPreview = false" />
 
       <WelcomeModal v-model:show="showWelcome" />

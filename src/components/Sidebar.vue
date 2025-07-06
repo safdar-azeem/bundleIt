@@ -1,27 +1,26 @@
 <script setup lang="ts">
-import Button from './Button.vue'
 import { ref, computed } from 'vue'
 import { Icon } from '@iconify/vue'
+import Button from './Button.vue'
 import ThemeToggle from './ThemeToggle.vue'
 import { useHistory } from '../stores/history'
-import { exit, relaunch } from '@tauri-apps/plugin-process'
 
-const props = defineProps<{
+defineProps<{
+   isProcessing: boolean
    currentPath: string | null
-   refreshCurrentFolder: () => Promise<void>
    clearCache: () => void
+   selectFolder: (path: string | null) => void
+   refreshCurrentFolder: () => Promise<void>
 }>()
 
 const emit = defineEmits<{
-   'open-folder': [path: string]
    'open-settings': []
-   'clear-history': []
    'remove-item': [path: string]
+   'open-folder': [path: string]
 }>()
 
-const { history, removeFromHistory, clearHistory } = useHistory()
 const sortBy = ref<'name' | 'date'>('name')
-const isRefreshing = ref(false)
+const { history, removeFromHistory } = useHistory()
 
 const sortedHistory = computed(() => {
    return [...history.value].sort((a, b) => {
@@ -32,31 +31,8 @@ const sortedHistory = computed(() => {
    })
 })
 
-async function handleRefresh() {
-   try {
-      isRefreshing.value = true
-      props?.clearCache()
-      await relaunch()
-   } finally {
-      isRefreshing.value = false
-   }
-}
-
 function handleFolderClick(path: string) {
    emit('open-folder', path)
-}
-
-function toggleSort() {
-   sortBy.value = sortBy.value === 'name' ? 'date' : 'name'
-}
-
-async function handleClearHistory() {
-   const isConfirmed = await confirm('Are you sure you want to clear all history?')
-
-   if (isConfirmed) {
-      clearHistory()
-      emit('clear-history')
-   }
 }
 
 function handleRemoveItem(path: string) {
@@ -74,36 +50,15 @@ function handleRemoveItem(path: string) {
       </div>
 
       <!-- History Header -->
-      <div class="p-4 border-b bg-white" v-if="history.length > 0">
+      <div class="p-4 border-b bg-white">
          <div class="flex items-center justify-between">
-            <p class="font-medium text-gray-700">History</p>
-            <div class="flex items-center gap-2">
-               <Button
-                  variant="secondary"
-                  :icon="isRefreshing ? 'svg-spinners:180-ring' : 'lucide:refresh-cw'"
-                  size="sm"
-                  class="text-gray-500"
-                  :disabled="isRefreshing"
-                  title="Refresh and clear cache"
-                  @click="handleRefresh"
-                  v-if="history.length > 0" />
-               <Button
-                  v-if="history.length > 0"
-                  variant="secondary"
-                  icon="lucide:trash"
-                  size="sm"
-                  class="text-gray-500"
-                  title="Clear history"
-                  @click="handleClearHistory" />
-               <Button
-                  variant="secondary"
-                  :icon="sortBy === 'name' ? 'lucide:arrow-down-z-a' : 'lucide:calendar'"
-                  size="sm"
-                  class="text-gray-500"
-                  :title="sortBy === 'name' ? 'Sort by date' : 'Sort by name'"
-                  @click="toggleSort"
-                  v-if="history.length > 0" />
-            </div>
+            <Button
+               text="Choose Folder"
+               class="w-full"
+               variant="secondary"
+               icon="lucide:folder"
+               :disabled="isProcessing"
+               @click="() => selectFolder(null)" />
          </div>
       </div>
 
